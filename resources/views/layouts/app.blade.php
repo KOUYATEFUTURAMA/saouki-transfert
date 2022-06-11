@@ -122,7 +122,7 @@
 								</li>
                                 <li class="h-20px"></li>
                                 @if(Auth::user()->role == 'Superviseur')
-                                    @include('layouts.partials.menus.admin.operation')
+                                    @include('layouts.partials.menus.comptable-superviseur.operation')
                                 @endif
                                 @if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
                                     @include('layouts.partials.menus.admin.parametre')

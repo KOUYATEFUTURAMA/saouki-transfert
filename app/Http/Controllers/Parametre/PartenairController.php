@@ -39,7 +39,16 @@ class PartenairController extends Controller
         $jsonData["total"] = $partenairs->count();
         return response()->json($jsonData);
     }
+    public function findPartenair($id){
+        $partenairs = Partenair::select('partenairs.contact')
+                            ->where('partenairs.id',$id)
+                            ->orderBy('name', 'ASC')
+                            ->get();
 
+        $jsonData["rows"] = $partenairs->toArray();
+        $jsonData["total"] = $partenairs->count();
+        return response()->json($jsonData);
+    }
     public function listPartenairsByCountry($country){
         $partenairs = Partenair::with('country')
                             ->select('partenairs.*')

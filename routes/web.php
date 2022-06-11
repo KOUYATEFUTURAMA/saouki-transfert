@@ -31,6 +31,9 @@ Route::get('/home-agent', 'HomeController@agent')->name('home-agent');
 
 //les routes du module Parametre
 Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('parametre')->group(function () {
+    //Configurations
+    Route::resource('configurations', 'ConfigurationController');
+
     //Route countries
     Route::resource('countries', 'CountryController');
     Route::get('list-countries', 'CountryController@listCountries');
@@ -58,7 +61,7 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::get('list-caisses-by-city/{city}', 'CaisseController@listCaisseByCity');
     Route::get('list-caisses-by-agency/{agency}', 'CaisseController@listCaisseByAgency');
     
-    //Route customers
+    //Route customers 
     Route::resource('customers', 'CustomerController');
     Route::get('list-customers', 'CustomerController@listCustomers');
     Route::get('list-customers-by-country/{country}', 'CustomerController@listCustomersByCountry');
@@ -66,14 +69,16 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     //Route banks
     Route::resource('banks', 'BankController');
     Route::get('list-banks', 'BankController@listBank');
+    Route::get('find-bank/{id}', 'BankController@findBank');
     Route::get('list-banks-by-country/{country}', 'BankController@listBankByCountry');
 
-    //Route partenairs
+    //Route partenairs 
     Route::resource('partenairs', 'PartenairController');
     Route::get('list-partenairs', 'PartenairController@listPartenairs');
+    Route::get('find-partenair/{id}', 'PartenairController@findPartenair');
     Route::get('list-partenairs-by-country/{country}', 'PartenairController@listPartenairsByCountry');
 
-    //Route Taux transfert
+    //Route Taux transfert 
     Route::resource('taux-transferts', 'TauxTransfertController');
     Route::get('list-taux-transferts', 'TauxTransfertController@listTauxTransfert');
 });
@@ -83,13 +88,22 @@ Route::namespace('Operation')->middleware('auth')->name('operation.')->prefix('o
 
     //Route oprations
     Route::resource('operations', 'OperationController');
-      /** Partenaire */
-    Route::get('operations-partenairs', 'OperationController@vueOperationPartenair')->name('operations-partenairs');
     Route::get('list-operations', 'OperationController@listOperations');
-    Route::get('list-operations-partenairs', 'OperationController@listOperationsPartenairs');
+    Route::get('recu-operation/{id}', 'OperationController@recuOperation');
 
-    //Route CaisseOuverte
+    /** Partenaire */
+    Route::get('operations-partenairs', 'OperationController@vueOperationPartenair')->name('operations-partenairs');
+    Route::get('list-operations-partenairs', 'OperationController@listOperationsPartenairs');
+    Route::get('list-operations-by-partenairs/{partenair}', 'OperationController@listOperationsByPartenairs');
+
+    //** Bank */
+    Route::get('operations-banks', 'OperationController@vueOperationBank')->name('operations-banks');
+    Route::get('list-operations-banks', 'OperationController@listOperationsBanks');
+    Route::get('list-operations-by-banks/{bank}', 'OperationController@listOperationsByBanks');
+
+    //Route CaisseOuverte 
     Route::resource('caisse-ouvertes', 'CaisseOuverteController');
+    Route::post('open-caisse', 'CaisseOuverteController@openCaisse')->name('open-caisse');
     Route::get('list-caisse-ouvertes', 'CaisseOuverteController@listOperationsPartenairs');
 });
 

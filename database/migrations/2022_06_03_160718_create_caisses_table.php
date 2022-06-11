@@ -16,6 +16,7 @@ class CreateCaissesTable extends Migration
         Schema::create('caisses', function (Blueprint $table) {
             $table->id();
             $table->string("libelle_caisse");
+            $table->boolean("ouverte")->default(0);
             $table->integer("country_id");
             $table->integer("city_id")->nullable();
             $table->integer("agency_id")->nullable();

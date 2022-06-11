@@ -21,8 +21,8 @@ class Operation extends Model
         'id_card_receptionist',
         'bank_id',
         'city_id',
-        'debtor_fund',
-        'credit_fund',
+        'other_caisse_id',
+        'caisse_ouverte_id',
         'user_id',
         'authorized_by',
         'observation',
@@ -43,12 +43,12 @@ class Operation extends Model
         return $this->belongsTo(City::class,'city_id');
     }
 
-    public function debtor_fund(){
+    public function caisse_ouverte(){
         return $this->belongsTo(CaisseOuverte::class,'caisse_ouverte_id');
     }
 
-    public function credit_fund(){
-        return $this->belongsTo(CaisseOuverte::class,'caisse_ouverte_id');
+    public function other_caisse(){
+        return $this->belongsTo(CaisseOuverte::class,'other_caisse_id');
     }
 
     public function user(){

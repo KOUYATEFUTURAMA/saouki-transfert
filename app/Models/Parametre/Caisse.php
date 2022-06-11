@@ -11,6 +11,7 @@ class Caisse extends Model
 {
     protected $fillable = [
                             'libelle_caisse',
+                            'ouverte',
                             'country_id',
                             'city_id',
                             'agency_id',

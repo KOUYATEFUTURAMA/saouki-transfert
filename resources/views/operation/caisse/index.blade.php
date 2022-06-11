@@ -18,7 +18,7 @@
                                 Etat de la caisse :  @if($caisseOuverte == null)
                                             <span class="text-danger">Ferm&eacute;e</span>
                                         @else
-                                            <span class="text-success">Ouvert</span>
+                                            <span class="text-success">Ouverte</span>
                                         @endif
                             </h4>
                             <h4>
@@ -118,7 +118,26 @@
                         </div>
                         <div class="modal-body">
                             @csrf
-                           
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="caisse_id">Caisse *</label>
+                                        <div class="input-group input-group-sm">
+                                            <select class="form-control" id="caisse_id" name="caisse_id" required>
+                                                
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Montant &agrave; l'ouverture *</label>
+                                        <input type="number" min="0" class="form-control" name="montant_ouverture" id="montant_ouverture" placeholder="25000" required>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary font-weight-bold">Valider</button>
@@ -131,4 +150,89 @@
             </div>
         </div>
     </div>
+
+    <input type="hidden" id="role" value="{{Auth::user()->role}}">
+    <input type="hidden" id="country_id" value="{{Auth::user()->country_id}}">
+    <script type="text/javascript">
+        var $table = jQuery("#table"), rows = [];
+
+        $(function () {
+            $("#formOpenCaisse").submit(function (e) {
+                    e.preventDefault();
+                    var $overlayBlock = $(".overlay-block");
+                    var $spinnerLg = $(".spinner-lg");
+
+                    var methode = 'POST';
+                    var url = "{{route('operation.open-caisse')}}";
+
+                    ouvertureCaisseAction(methode, url, $(this), $(this).serialize(), $overlayBlock, $spinnerLg);
+            });
+        });
+
+    function ouvertureCaisse(){
+        var role = $("#role").val();
+        if(role == 'Superviseur'){
+            var country = $("#country_id").val();
+            $.getJSON("../parametre/list-caisses-by-country/" + country, function (reponse) {
+                $('#caisse_id').html("<option value=''>Sélectionner une caisse</option>");
+                $.each(reponse.rows, function (index, caisse) { 
+                    if(caisse.city_id == null && caisse.agency_id == null){
+                        $("#caisse_id").append("<option value="+caisse.id+">"+caisse.libelle_caisse+"</option>")
+                    }
+                });
+            })
+        }
+        $(".bs-modal-open-caisse").modal("show");
+    }
+
+        //Ouverture caisse
+    function ouvertureCaisseAction(methode, url, $formObject, formData, $overlayBlock, $spinnerLg){
+        jQuery.ajax({
+                type: methode,
+                url: url,
+                cache: false,
+                data: formData,
+                success:function (response, textStatus, xhr){
+                    if (response.code === 1) {
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: response.msg,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                        //Si la caisse est ouverte on actualise la page
+                        location.reload();
+                    }
+                    if (response.code === 0) {
+                        Swal.fire({
+                            position: "center",
+                            icon: "warning",
+                            title: response.msg,
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    }
+                 },
+                error: function (err) {
+                    var res = eval('('+err.responseText+')');
+                    Swal.fire({
+                        position: "center",
+                        icon: "error",
+                        title: res.message,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                },
+                beforeSend: function () {
+                    $overlayBlock.addClass('overlay');
+                    $spinnerLg.addClass('spinner');
+                },
+                complete: function () {
+                    $overlayBlock.removeClass('overlay');
+                    $spinnerLg.removeClass('spinner');
+                },
+        });
+    }
+    </script>
 @endsection

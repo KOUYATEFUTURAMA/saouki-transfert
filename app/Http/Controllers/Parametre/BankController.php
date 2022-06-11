@@ -39,6 +39,17 @@ class BankController extends Controller
         return response()->json($jsonData);
     }
 
+    public function findBank($id){
+        $banks = Bank::with('country')
+                            ->select('banks.*')
+                            ->where('id',$id)
+                            ->get();
+
+        $jsonData["rows"] = $banks->toArray();
+        $jsonData["total"] = $banks->count();
+        return response()->json($jsonData);
+    }
+
     public function listCitiesByCountry($country){
         $banks = Bank::with('country')
                             ->select('banks.*')

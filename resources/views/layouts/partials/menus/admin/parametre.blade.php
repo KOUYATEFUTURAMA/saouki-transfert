@@ -96,6 +96,16 @@
                     <span class="menu-text">Banque</span>
                 </a>
             </li>
+            @if(Auth::user()->id == 1)
+            <li class="menu-item {{Route::currentRouteName() === 'parametre.configurations.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('parametre.configurations.index')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Configuration</span>
+                </a>
+            </li>                       
+            @endif
         </ul>
     </div>
 </li>
