@@ -34,22 +34,42 @@ class OperationController extends Controller
         }
     }
     public function listOperationsPartenairs(){
-        $operations = Operation::with('partenair','user','authorized_by')
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('partenair','user','authorized_by')
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
                             ->orderBy('id', 'DESC')
                             ->where('partenair_id','!=',NULL)
                             ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('partenair','user','authorized_by')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->orderBy('id', 'DESC')
+                            ->where([['partenair_id','!=',NULL],['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->get();
+        }
 
         $jsonData["rows"] = $operations->toArray();
         $jsonData["total"] = $operations->count();
         return response()->json($jsonData);
     }
     public function listOperationsByPartenairs($partenair){
-        $operations = Operation::with('partenair','user','authorized_by')
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('partenair','user','authorized_by')
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
                             ->orderBy('id', 'DESC')
                             ->where('partenair_id',$partenair)
                             ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('partenair','user','authorized_by')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->orderBy('id', 'DESC')
+                            ->where([['partenair_id',$partenair],['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->get();
+        }
 
         $jsonData["rows"] = $operations->toArray();
         $jsonData["total"] = $operations->count();
@@ -62,6 +82,7 @@ class OperationController extends Controller
         $banks = DB::table('banks')
                         ->select('libelle_bank','id')
                         ->orderBy('libelle_bank', 'ASC')
+                        ->where('country_id', Auth::user()->country_id)
                         ->get();
 
         $menuPrincipal = "Opération";
@@ -75,27 +96,332 @@ class OperationController extends Controller
         }
     }
     public function listOperationsBanks(){
-        $operations = Operation::with('bank','user','authorized_by')
-                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('bank','user','authorized_by')
+                            ->join('banks','banks.id','=','operations.bank_id')
+                            ->join('countries','countries.id','=','banks.country_id')
+                            ->select('operations.*','countries.libelle_country',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
                             ->orderBy('id', 'DESC')
                             ->where('bank_id','!=',NULL)
                             ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('bank','user','authorized_by')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->join('banks','banks.id','=','operations.bank_id')
+                            ->join('countries','countries.id','=','banks.country_id')
+                            ->select('operations.*','countries.libelle_country',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->orderBy('id', 'DESC')
+                            ->where([['bank_id','!=',NULL],['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->get();
+        }
 
         $jsonData["rows"] = $operations->toArray();
         $jsonData["total"] = $operations->count();
         return response()->json($jsonData);
     }
     public function listOperationsByBanks($bank){
-        $operations = Operation::with('bank','user','authorized_by')
-                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('bank','user','authorized_by')
+                            ->join('banks','banks.id','=','operations.bank_id')
+                            ->join('countries','countries.id','=','banks.country_id')
+                            ->select('operations.*','countries.libelle_country',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
                             ->orderBy('id', 'DESC')
                             ->where('bank_id',$bank)
                             ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('bank','user','authorized_by')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->join('banks','banks.id','=','operations.bank_id')
+                            ->join('countries','countries.id','=','banks.country_id')
+                            ->select('operations.*','countries.libelle_country',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->orderBy('id', 'DESC')
+                            ->where([['bank_id',$bank],['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->get();
+        }
 
         $jsonData["rows"] = $operations->toArray();
         $jsonData["total"] = $operations->count();
         return response()->json($jsonData);
     }
+
+    //** Décaissement - Encaissement */
+    public function vueOperationDecaissementEncaissement(){
+
+        $caisses = DB::table('caisses')
+                        ->join('caisse_ouvertes','caisse_ouvertes.caisse_id','=','caisses.id')
+                        ->select('libelle_caisse','caisse_ouvertes.id')
+                        ->where([['country_id', Auth::user()->country_id],['caisse_ouvertes.date_fermeture',NULL],['user_id','!=',Auth::user()->id],['caisses.agency_id','!=',NULL],['caisses.ouverte',1]])
+                        ->orderBy('libelle_caisse', 'ASC')
+                        ->get();
+
+        $menuPrincipal = "Opération";
+        $titleControlleur = "de décaissement et encaissement";
+        $btnModalAjout = (Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable") ? "TRUE" : "FALSE";
+
+        if(Auth::user()->role != "Agent"){
+            return view('operation.decaissement-encaissement.index', compact('caisses','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        }else{
+            return abort(404);
+        }
+    }
+    public function listOperationsDecaissementEncaissement(){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by')
+                            ->join('caisse_ouvertes as caisse_provenance','caisse_provenance.id','=','operations.caisse_ouverte_id')
+                            ->join('caisse_ouvertes as caisse_destination','caisse_destination.id','=','operations.other_caisse_id')
+                            ->join('caisses as caissP','caissP.id','=','caisse_provenance.caisse_id')
+                            ->join('caisses as caissD','caissD.id','=','caisse_destination.caisse_id')
+                            ->select('operations.*','caissP.libelle_caisse as libel_cais_p','caissD.libelle_caisse as lib_cais_d',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where('other_caisse_id','!=',NULL)
+                            ->orderBy('id', 'DESC')
+                            ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by')
+                            ->join('caisse_ouvertes as caisse_provenance','caisse_provenance.id','=','operations.caisse_ouverte_id')
+                            ->join('caisse_ouvertes as caisse_destination','caisse_destination.id','=','operations.other_caisse_id')
+                            ->join('caisses as caissP','caissP.id','=','caisse_provenance.caisse_id')
+                            ->join('caisses as caissD','caissD.id','=','caisse_destination.caisse_id')
+                            ->select('operations.*','caissP.libelle_caisse as libel_cais_p','caissD.libelle_caisse as lib_cais_d',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['other_caisse_id','!=',NULL],['operations.user_id',Auth::user()->id],['caisse_provenance.date_fermeture',NULL]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        return response()->json($jsonData);
+    }
+    public function listOperationsDecaissementEncaissementByCaisse($caisse){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by')
+                            ->join('caisse_ouvertes as caisse_provenance','caisse_provenance.id','=','operations.caisse_ouverte_id')
+                            ->join('caisse_ouvertes as caisse_destination','caisse_destination.id','=','operations.other_caisse_id')
+                            ->join('caisses as caissP','caissP.id','=','caisse_provenance.caisse_id')
+                            ->join('caisses as caissD','caissD.id','=','caisse_destination.caisse_id')
+                            ->select('operations.*','caissP.libelle_caisse as libel_cais_p','caissD.libelle_caisse as lib_cais_d',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where('other_caisse_id',$caisse)
+                            ->orderBy('id', 'DESC')
+                            ->get();
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by')
+                            ->join('caisse_ouvertes as caisse_provenance','caisse_provenance.id','=','operations.caisse_ouverte_id')
+                            ->join('caisse_ouvertes as caisse_destination','caisse_destination.id','=','operations.other_caisse_id')
+                            ->join('caisses as caissP','caissP.id','=','caisse_provenance.caisse_id')
+                            ->join('caisses as caissD','caissD.id','=','caisse_destination.caisse_id')
+                            ->select('operations.*','caissP.libelle_caisse as libel_cais_p','caissD.libelle_caisse as lib_cais_d',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['other_caisse_id',$caisse],['operations.user_id',Auth::user()->id],['caisse_provenance.date_fermeture',NULL]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+        }
+        
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        return response()->json($jsonData);
+    }
+
+    public function listOperations(){
+        $totalEntree = 0; $totalSortie = 0;
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        $jsonData["totalEntree"] = $totalEntree;
+        $jsonData["totalSortie"] = $totalSortie;
+        $jsonData["totalSolde"] = ($totalEntree - $totalSortie);
+        return response()->json($jsonData);
+    }
+
+    public function listOperationsByReference($reference){
+        $totalEntree = 0; $totalSortie = 0;
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where('reference','like','%'.$reference.'%')
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['reference','like','%'.$reference.'%']])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        $jsonData["totalEntree"] = $totalEntree;
+        $jsonData["totalSortie"] = $totalSortie;
+        $jsonData["totalSolde"] = ($totalEntree - $totalSortie);
+        return response()->json($jsonData);
+    }
+
+    public function listOperationsByType($type){
+        $totalEntree = 0; $totalSortie = 0;
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where('operation_type',$type)
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operation_type',$type]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        $jsonData["totalEntree"] = $totalEntree;
+        $jsonData["totalSortie"] = $totalSortie;
+        $jsonData["totalSolde"] = ($totalEntree - $totalSortie);
+        return response()->json($jsonData);
+    }
+
+    public function listOperationsByState($state){
+        $totalEntree = 0; $totalSortie = 0;
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where('state',$state)
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['state',$state]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        $jsonData["totalEntree"] = $totalEntree;
+        $jsonData["totalSortie"] = $totalSortie;
+        $jsonData["totalSolde"] = ($totalEntree - $totalSortie);
+        return response()->json($jsonData);
+    }
+
+    public function listOperationsByConcerne($concerne){
+        $totalEntree = 0; $totalSortie = 0;
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where($concerne,'!=',NULL)
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+        if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable"){
+            $operations = Operation::with('user','authorized_by','bank','partenair')
+                            ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],[$concerne,'!=',NULL]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+            foreach ($operations as $operation) {
+                if($operation->operation_type == "deposit"){
+                    $totalEntree += $operation->amount;
+                }else{
+                    $totalSortie += $operation->amount;
+                }
+            }
+        }
+
+        $jsonData["rows"] = $operations->toArray();
+        $jsonData["total"] = $operations->count();
+        $jsonData["totalEntree"] = $totalEntree;
+        $jsonData["totalSortie"] = $totalSortie;
+        $jsonData["totalSolde"] = ($totalEntree - $totalSortie);
+        return response()->json($jsonData);
+    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -113,7 +439,7 @@ class OperationController extends Controller
             try {
 
                 //Vérification de caisse 
-                $caisseOuverte = CaisseOuverte::where([['user_id',Auth::user()->id],['date_fermeture',null]])->first();
+                $caisseOuverte = CaisseOuverte::where([['user_id',Auth::user()->id],['date_fermeture',NULL]])->first();
                 if(!$caisseOuverte){
                     return response()->json(["code" => 0, "msg" => "Votre caisse est fermée", "data" => NULL]);
                 }
@@ -142,15 +468,15 @@ class OperationController extends Controller
                 if(empty($data['id']) && !isset($data['reference'])){
                     //formation numéro de référence
                     $maxIdOperation = DB::table('operations')->max('id');
-                    $operation->reference = date("dmYHis").$maxIdOperation;
+                    $operation->reference = date("dmYHis").($maxIdOperation+1);
                 }
 
                 if(isset($data['reference'])){
                     $operation->reference = $data['reference'];
                 }
 
-                $operation->operation_type = $data['operation_type'];
                 $operation->amount = $data['amount'];
+                $operation->operation_type = $data['operation_type'];
                 $operation->caisse_ouverte_id = $caisseOuverte->id;
                 $operation->date = Carbon::createFromFormat('d-m-Y H:i', $data['dateOperation']);
                 $operation->partenair_id = isset($data['partenair_id']) ? $data['partenair_id'] : NULL; 
@@ -168,7 +494,61 @@ class OperationController extends Controller
                 }
                 $operation->state = $data['state'];
                 $operation->observation = isset($data['observation']) ? $data['observation'] : NULL;
-                
+                $operation->pattern = isset($data['pattern']) ? $data['pattern'] : NULL;
+               
+                //Décaissement - Encaissement
+                if(isset($data['other_caisse_id'])){
+                    //Verification si l'autre caisse est ouverte
+                    $caisseOuverte = CaisseOuverte::where([['id',$data['other_caisse_id']],['date_fermeture',NULL]])->first();
+                    if(!$caisseOuverte){
+                        return response()->json(["code" => 0, "msg" => "La caisse que vous visez est fermée !", "data" => NULL]);
+                    }
+
+                    $operation->other_caisse_id = $data['other_caisse_id'];
+                    $operation->save();
+                    //Nouvel ajout
+                    if(empty($data['id'])){
+                        $operationOtherCaisse = New Operation();
+                        $operationOtherCaisse->operation_id = $operation->id;
+                        $operationOtherCaisse->reference = date("dmYHis").($maxIdOperation+2);
+                        $operationOtherCaisse->operation_type = ($data['operation_type'] == "deposit") ? "withdrawal" : "deposit";
+                        $operationOtherCaisse->amount = $data['amount'];
+                        $operationOtherCaisse->date = Carbon::createFromFormat('d-m-Y H:i', $data['dateOperation']);
+                        $operationOtherCaisse->caisse_ouverte_id = $data['other_caisse_id'];
+                        $operationOtherCaisse->receptionist = isset($data['receptionist']) ? $data['receptionist'] : NULL;
+                        $operationOtherCaisse->id_card_receptionist = isset($data['id_card_receptionist']) ? $data['id_card_receptionist'] : NULL;
+                        $operationOtherCaisse->user_id = Auth::user()->id;
+                        if($data['state'] != "authorized"){
+                            $operationOtherCaisse->authorized_by = Auth::user()->id;
+                            $operationOtherCaisse->authorization_date = now();
+                        }
+                        $operationOtherCaisse->state = $data['state'];
+                        $operationOtherCaisse->observation = isset($data['observation']) ? $data['observation'] : NULL;
+                        $operationOtherCaisse->pattern = isset($data['pattern']) ? $data['pattern'] : NULL;
+                        $operationOtherCaisse->save();
+                    }
+
+                    //En cas de modification
+                    if(!empty($data['id'])){
+                        $operationOtherCaisse = Operation::where('operation_id',$data['id'])->first();
+                        $operationOtherCaisse->operation_type = ($data['operation_type'] == "deposit") ? "withdrawal" : "deposit";
+                        $operationOtherCaisse->amount = $data['amount'];
+                        $operationOtherCaisse->date = Carbon::createFromFormat('d-m-Y H:i', $data['dateOperation']);
+                        $operationOtherCaisse->caisse_ouverte_id = $data['other_caisse_id'];
+                        $operationOtherCaisse->receptionist = isset($data['receptionist']) ? $data['receptionist'] : NULL;
+                        $operationOtherCaisse->id_card_receptionist = isset($data['id_card_receptionist']) ? $data['id_card_receptionist'] : NULL;
+                        $operationOtherCaisse->user_id = Auth::user()->id;
+                        if($operation->state != "authorized" && $data['state'] == "authorized"){
+                            $operationOtherCaisse->authorized_by = Auth::user()->id;
+                            $operationOtherCaisse->authorization_date = now();
+                        }
+                        $operationOtherCaisse->state = $data['state'];
+                        $operationOtherCaisse->observation = isset($data['observation']) ? $data['observation'] : NULL;
+                        $operationOtherCaisse->pattern = isset($data['pattern']) ? $data['pattern'] : NULL;
+                        $operationOtherCaisse->save();
+                    }
+                }
+
                 //file uploading
                 if(isset($data['file_to_upload'])){
                     $file_name = 'file_to_upload'.date('dmYHis').'.jpg';
@@ -240,10 +620,7 @@ class OperationController extends Controller
                         ->first();
         $tittre = ""; $depot_retrait = "";
         if($operation->partenair_id != null){
-            $tittre = "Partenaire";
-        }  
-        if($operation->bank_id != null){
-            $tittre = "Banque";
+            $tittre = " de partenaire";
         }  
         if($operation->other_caisse_id != null){
             $tittre = "Caisse";

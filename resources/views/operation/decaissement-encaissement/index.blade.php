@@ -15,12 +15,12 @@
                     <div class="row">
                         <div class="col-xl-3">
                             <div class="form-group">
-                                <label for="theme_id">Recherche par partenaire</label>
+                                <label for="theme_id">Recherche par caisse</label>
                                 <div class="input-group input-group-sm">
-                                    <select class="form-control" id="searchByPartenaire">
-                                        <option value="0"> Tous les partenaires</option>
-                                        @foreach($partenairs as $partenair)
-                                        <option value="{{$partenair->id}}"> {{$partenair->name}}</option>
+                                    <select class="form-control" id="searchByBank">
+                                        <option value="0"> Toutes les caisses</option>
+                                        @foreach($caisses as $caisse)
+                                        <option value="{{$caisse->id}}"> {{$caisse->libelle_caisse}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -31,23 +31,21 @@
                             data-pagination="true"
                             data-search="true"
                             data-toggle="table"
-                            data-url="{{ url('operation', ['action' => 'list-operations-partenairs']) }}"
+                            data-url="{{ url('operation', ['action' => 'list-decaissement-encaissement']) }}"
                             data-unique-id="id"
                             data-show-columns="true"
                             data-show-toggle="false">
                             <thead>
                                 <tr role="row">
-                                    <th data-field="id" data-formatter="recuFormatter">re&ccedil;u</th>
                                     <th data-field="dateOperation">Date</th>
                                     <th data-field="reference" data-searchable="true">R&eacute;f&eacute;rence</th>
                                     <th data-field="amount" data-formatter="amountFormatter">Montant</th>
                                     <th data-field="operation_type" data-formatter="typeFormatter">Type</th>
-                                    <th data-field="partenair.name">Partenaire</th>
-                                    <th data-field="partenair.contact" data-visible="false">Contact</th>
-                                    <th data-field="receptionist">Mandataire</th>
+                                    <th data-field="libel_cais_p">Caisse prov&eacute;nance</th>
+                                    <th data-field="lib_cais_d">Caisse destination</th>
+                                    <th data-field="receptionist" data-visible="false">Mandataire</th>
                                     <th data-field="receptionist" data-visible="false">Carte d'identit&eacute; Mandataire</th>
                                     <th data-formatter="stateFormatter">Etat</th>
-                                    <th data-field="user.name">Caissier</th>
                                     <th data-field="observation" data-visible="false">Observation</th>
                                     <th data-field="file_to_upload" data-formatter="fileFormatter" data-visible="false">Document</th>
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
@@ -66,7 +64,7 @@
                 <div class="overlay overlay-block">
                     <form id="formAjout" ng-controller="formAjoutCtrl" action="#" enctype="multipart/form-data">
                         <div class="modal-header">
-                            <h5 class="modal-title">Gestion des op&eacute;rations des partenaires</h5>
+                            <h5 class="modal-title">Gestion des op&eacute;rations de d&eacute;caissement et encaissement</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <i aria-hidden="true" class="ki ki-close"></i>
                             </button>
@@ -77,12 +75,12 @@
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label for="partenair_id">Partenaire * </label>
+                                        <label for="other_caisse_id">Caisse (Prov&eacute;nance ou destination) * </label>
                                         <div class="input-group">
-                                            <select class="form-control" id="partenair_id" name="partenair_id" required>
-                                                <option value=""> Selectionner le partenaire </option>
-                                                @foreach($partenairs as $partenair)
-                                                    <option value="{{$partenair->id}}"> {{$partenair->name}}</option>
+                                            <select class="form-control" id="other_caisse_id" name="other_caisse_id" required>
+                                                <option value=""> Selectionner la caisse </option>
+                                                @foreach($caisses as $caisse)
+                                                    <option value="{{$caisse->id}}"> {{$caisse->libelle_caisse}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -90,8 +88,8 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>Contact</label>
-                                        <input type="text" class="form-control" id="contact_partenair" readonly>
+                                        <label>Caissier</label>
+                                        <input type="text" class="form-control" id="caissier" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -109,16 +107,16 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="form-group mt-10">
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="deposit" value="deposit" ng-model="operation.operation_type" ng-checked="operation.operation_type!='withdrawal'"/>
-                                        &nbsp;D&eacute;p&ocirc;t</label>
+                                        &nbsp;D&eacute;caissement</label>
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="operation_type" value="withdrawal" ng-model="operation.operation_type" ng-checked="operation.operation_type=='withdrawal'"/>
-                                        &nbsp;Retrait</label>
+                                        &nbsp;Encaissement</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -127,7 +125,7 @@
                                         <input type="number" class="form-control" name="amount" id="amount" placeholder="Montat" required>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="partenair_id">Etat de l'op&eacute;ration *</label>
                                         <div class="input-group">
@@ -155,8 +153,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Document scann&eacute;</label>
-                                        <input type="file" class="form-control" name="file_to_upload">
+                                        <label>Motif</label>
+                                        <input type="text" class="form-control" name="pattern" id="pattern" placeholder="Motif de l'opération">
                                     </div>
                                 </div>
                             </div>
@@ -197,7 +195,7 @@
                             <input type="text" ng-hide="true" id="idOperationDelete" value="@{{ operation.id }}">
                             @csrf
                             <p class="text-center text-muted h5">Etes vous certain de vouloir supprimer cet enregistrement ?</p>
-                            <p class="text-center h4">@{{ operation.dateOperation + ' de ' + operation.partenair.name}}</p>
+                            <p class="text-center h4">@{{ operation.dateOperation + ' de ' + operation.other_caisse.libelle_caisse}}</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default font-weight-bold" data-dismiss="modal">Annuler</button>
@@ -240,7 +238,7 @@
             rows = data.rows;
         });
 
-        $('#partenair_id, #searchByPartenaire').select2({width: '100%'});
+        $('#other_caisse_id, #searchByCaisse').select2({width: '100%'});
 
         $('#kt_datetimepicker_2').datetimepicker({
             locale: 'fr',
@@ -250,27 +248,27 @@
             maxDate : new Date()
         });
 
-        $("#partenair_id").change(function (e) {
-            var partenair = $("#partenair_id").val();
-            $.getJSON("../parametre/find-partenair/" + partenair, function (reponse) {
-                $.each(reponse.rows, function (index, partenair) { 
-                    $("#contact_partenair").val(partenair.contact);
+        $("#other_caisse_id").change(function (e) {
+            var caisse = $("#other_caisse_id").val();
+            $.getJSON("../operation/find-open-caisse/" + caisse, function (reponse) {
+                $.each(reponse.rows, function (index, caisse) { 
+                    $("#caissier").val(caisse.user.name);
                 });
            });
         });
 
-        $("#searchByPartenaire").change(function (e) {
-            var partenaire = $("#searchByPartenaire").val();
-            if(partenaire == 0){
-                $table.bootstrapTable('refreshOptions', {url: "{{url('operation', ['action' => 'list-operations-partenairs'])}}"});
+        $("#searchByCaisse").change(function (e) {
+            var caisse = $("#searchByCaisse").val();
+            if(bank == 0){
+                $table.bootstrapTable('refreshOptions', {url: "{{url('operation', ['action' => 'list-decaissement-encaissement'])}}"});
             }else{
-                $table.bootstrapTable('refreshOptions', {url: '../operation/list-operations-by-partenairs/' + partenaire});
+                $table.bootstrapTable('refreshOptions', {url: '../operation/list-decaissement-encaissement-by-caisse/' + caisse});
             }
         });
-
+        
         $("#btnModalAjout").on("click", function () {
-            $("#partenair_id").val('').trigger('change');
-            $("#contact_partenair").val('');
+            $("#other_caisse_id").val('').trigger('change');
+            $("#caissier").val('');
         });
 
         $("#formAjout").submit(function (e) {
@@ -309,7 +307,7 @@
         $("#receptionist").val(operation.receptionist);
         $("#id_card_receptionist").val(operation.id_card_receptionist);
         $("#observation").val(operation.observation);
-        $("#partenair_id").val(operation.partenair_id).trigger('change');
+        $("#other_caisse_id").val(operation.other_caisse_id).trigger('change');
     
         $(".bs-modal-ajout").modal("show");
     }
@@ -338,17 +336,11 @@
     }
     function typeFormatter(type){
         if(type == "deposit"){
-            return "<span class='text-success'>Dépôt<span>";
+            return "<span class='text-success'>Décaissement<span>";
         }
         if(type == "withdrawal"){
-            return "<span class='text-danger'>Retrait<span>";
+            return "<span class='text-danger'>Encaissement<span>";
         }
-    }
-    function printRow(idOperation){
-       window.open("recu-operation/" + idOperation ,'_blank')
-    }
-    function recuFormatter(id, row){
-        return '<a class="flaticon2-printer text-secondary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Imprimer" onClick="javascript:printRow(' + id + ');"></a>';
     }
     function fileFormatter(file){
         return file ? "<a target='_blank' href='" + basePath + '/' + file + "'>Voir le document</a>" : "---";
@@ -375,8 +367,8 @@
                         timer: 2500
                     });
                     document.forms["formAjout"].reset();
-                    $("#partenair_id").val('').trigger('change');
-                    $("#contact_partenair").val('');
+                    $("#other_caisse_id").val('').trigger('change');
+                    $("#caissier").val('');
                     $table.bootstrapTable('refresh');
                 }
                 if (response.code === 0) {

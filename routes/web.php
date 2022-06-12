@@ -89,22 +89,33 @@ Route::namespace('Operation')->middleware('auth')->name('operation.')->prefix('o
     //Route oprations
     Route::resource('operations', 'OperationController');
     Route::get('list-operations', 'OperationController@listOperations');
+    Route::get('list-operations-by-reference/{reference}', 'OperationController@listOperationsByReference');
+    Route::get('list-operations-by-type/{type}', 'OperationController@listOperationsByType');
+    Route::get('list-operations-by-state/{state}', 'OperationController@listOperationsByState');
+    Route::get('list-operations-by-concerne/{concerne}', 'OperationController@listOperationsByConcerne');
     Route::get('recu-operation/{id}', 'OperationController@recuOperation');
 
-    /** Partenaire */
-    Route::get('operations-partenairs', 'OperationController@vueOperationPartenair')->name('operations-partenairs');
-    Route::get('list-operations-partenairs', 'OperationController@listOperationsPartenairs');
-    Route::get('list-operations-by-partenairs/{partenair}', 'OperationController@listOperationsByPartenairs');
+        /** Partenaire */
+        Route::get('operations-partenairs', 'OperationController@vueOperationPartenair')->name('operations-partenairs');
+        Route::get('list-operations-partenairs', 'OperationController@listOperationsPartenairs');
+        Route::get('list-operations-by-partenairs/{partenair}', 'OperationController@listOperationsByPartenairs');
 
-    //** Bank */
-    Route::get('operations-banks', 'OperationController@vueOperationBank')->name('operations-banks');
-    Route::get('list-operations-banks', 'OperationController@listOperationsBanks');
-    Route::get('list-operations-by-banks/{bank}', 'OperationController@listOperationsByBanks');
+        //** Bank */
+        Route::get('operations-banks', 'OperationController@vueOperationBank')->name('operations-banks');
+        Route::get('list-operations-banks', 'OperationController@listOperationsBanks');
+        Route::get('list-operations-by-banks/{bank}', 'OperationController@listOperationsByBanks');
+
+        //** Décaissement - Encaissement */
+        Route::get('decaissement-encaissement', 'OperationController@vueOperationDecaissementEncaissement')->name('decaissement-encaissement');
+        Route::get('list-decaissement-encaissement', 'OperationController@listOperationsDecaissementEncaissement');
+        Route::get('list-decaissement-encaissement-by-caisse/{caisse}', 'OperationController@listOperationsDecaissementEncaissementByCaisse');
 
     //Route CaisseOuverte 
     Route::resource('caisse-ouvertes', 'CaisseOuverteController');
     Route::post('open-caisse', 'CaisseOuverteController@openCaisse')->name('open-caisse');
-    Route::get('list-caisse-ouvertes', 'CaisseOuverteController@listOperationsPartenairs');
+    Route::post('close-caisse', 'CaisseOuverteController@closeCaisse')->name('close-caisse');
+    Route::get('find-open-caisse/{id}', 'CaisseOuverteController@findOpenCaisse');
+    Route::get('get-caisse-infos-cloture/{id}', 'CaisseOuverteController@getCaisseInfosCloture');
 });
 
 //les routes du module Auth

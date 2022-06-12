@@ -22,10 +22,12 @@ class Operation extends Model
         'bank_id',
         'city_id',
         'other_caisse_id',
+        'operation_id',
         'caisse_ouverte_id',
         'user_id',
         'authorized_by',
         'observation',
+        'pattern',
         'file_to_upload'
     ];
 

@@ -27,7 +27,7 @@
                             <h4 class="font-size-h5 d-block d-block font-weight-bold text-dark-50"><i class="la la-phone"></i> {{ $user->contact }}</h4>
                             <h4 class="font-size-h5 d-block d-block font-weight-bold text-dark-50"><i class="la la-envelope-open-text"></i> {{ $user->email }}</h4>
                             <h4 class="font-size-h5 d-block d-block font-weight-bold text-dark-50"><i class="la la-history"></i> {{'Inscrit le '.$user->created }}</h4>
-                            @if(Auth::user()->role == 'Superviseur')
+                            @if(Auth::user()->role == 'Superviseur' or Auth::user()->role == 'Comptable' or Auth::user()->role == 'Agent')
                             <h4 class="font-size-h5 d-block d-block font-weight-bold text-dark-50"><i class="la fab la-font-awesome-flag"></i> {{$user->country->libelle_country}}</h4>
                             @endif
                             @if(Auth::user()->role == 'Comptable' or Auth::user()->role == 'Agent')

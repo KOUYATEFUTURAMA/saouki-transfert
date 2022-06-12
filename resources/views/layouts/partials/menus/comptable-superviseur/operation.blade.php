@@ -44,6 +44,14 @@
                     <span class="menu-text">Op&eacute;rations de banque</span>
                 </a>
             </li>
+            <li class="menu-item {{Route::currentRouteName() === 'operation.decaissement-encaissement' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('operation.decaissement-encaissement')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">D&eacute;caiss. - Encaiss.</span>
+                </a>
+            </li>
         </ul>
     </div>
 </li>

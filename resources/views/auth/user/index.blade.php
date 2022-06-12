@@ -24,6 +24,7 @@
                                 <th data-field="email">E-mail</th>
                                 <th data-field="contact">Contact</th>
                                 <th data-field="role">Role</th>
+                                <th data-field="country.libelle_country">Pays</th>
                                 <th data-field="city.libelle_city">Ville</th>
                                 <th data-field="agency.libelle_agency">Agence</th>
                                 <th data-field="statut_compte" data-formatter="statutFormatter">Etat</th>

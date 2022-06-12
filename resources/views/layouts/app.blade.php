@@ -121,7 +121,7 @@
 									</a>
 								</li>
                                 <li class="h-20px"></li>
-                                @if(Auth::user()->role == 'Superviseur')
+                                @if(Auth::user()->role == 'Superviseur' OR Auth::user()->role == 'Comptable')
                                     @include('layouts.partials.menus.comptable-superviseur.operation')
                                 @endif
                                 @if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
@@ -303,7 +303,7 @@
 								</span>
 							</a>
 						</div>
-                        @if(Auth::user()->role == 'Superviseur')
+                        @if(Auth::user()->role == 'Superviseur' or Auth::user()->role == 'Comptable' or Auth::user()->role == 'Agent')
                             <div class="text-muted mt-1">
                                 Pays : {{Auth::user()->country->libelle_country}}
                             </div>

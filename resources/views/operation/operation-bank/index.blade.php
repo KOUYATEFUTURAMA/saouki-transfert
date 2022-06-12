@@ -37,17 +37,17 @@
                             data-show-toggle="false">
                             <thead>
                                 <tr role="row">
-                                    <th data-field="id" data-formatter="recuFormatter">re&ccedil;u</th>
                                     <th data-field="dateOperation">Date</th>
                                     <th data-field="reference" data-searchable="true">R&eacute;f&eacute;rence</th>
                                     <th data-field="amount" data-formatter="amountFormatter">Montant</th>
                                     <th data-field="operation_type" data-formatter="typeFormatter">Type</th>
                                     <th data-field="bank.libelle_bank">Banque</th>
                                     <th data-field="bank.contact" data-visible="false">Contact</th>
-                                    <th data-field="receptionist" data-visible="false">R&eacute;ceptionneur</th>
-                                    <th data-field="receptionist" data-visible="false">Carte d'identit&eacute; R&eacute;ceptionneur</th>
+                                    <th data-field="libelle_country">Zone</th>
+                                    <th data-field="receptionist">Mandataire</th>
+                                    <th data-field="receptionist" data-visible="false">Carte d'identit&eacute; Mandataire</th>
                                     <th data-formatter="stateFormatter">Etat</th>
-                                    <th data-field="user.name">Caissier</th>
+                                    <th data-field="user.name" data-visible="false">Caissier</th>
                                     <th data-field="observation" data-visible="false">Observation</th>
                                     <th data-field="file_to_upload" data-formatter="fileFormatter" data-visible="false">Document</th>
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
@@ -109,16 +109,16 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="form-group mt-10">
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="deposit" value="deposit" ng-model="operation.operation_type" ng-checked="operation.operation_type!='withdrawal'"/>
-                                        &nbsp;D&eacute;p&ocirc;t</label>
+                                        &nbsp;Retrait banque</label>
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="operation_type" value="withdrawal" ng-model="operation.operation_type" ng-checked="operation.operation_type=='withdrawal'"/>
-                                        &nbsp;Retrait</label>
+                                        &nbsp;D&eacute;p&ocirc;t banque</label>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -127,9 +127,9 @@
                                         <input type="number" class="form-control" name="amount" id="amount" placeholder="Montat" required>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label for="partenair_id">Etat du retrait *</label>
+                                        <label for="partenair_id">Etat de l'op&eacute;ration *</label>
                                         <div class="input-group">
                                             <select class="form-control" id="state" name="state" required>
                                                 <option value="recorded"> Enregistr&eacute;e </option>
@@ -143,14 +143,14 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>R&eacute;ceptionneur </label>
+                                        <label>Mandataire </label>
                                         <input type="text" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" class="form-control" name="receptionist" id="receptionist" placeholder="Nom complet">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Carte d'identit&eacute; du r&eacute;ceptionneur</label>
-                                        <input type="text" class="form-control" name="id_card_receptionist" id="id_card_receptionist" placeholder="N° carte d'identité">
+                                        <label>R&eacute;f&eacute;rence *</label>
+                                        <input type="text" class="form-control" name="reference" id="reference" placeholder="N° de chèque ou de versement" required>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -259,18 +259,18 @@
            });
         });
 
-        $("#searchByPartenaire").change(function (e) {
-            var partenaire = $("#searchByPartenaire").val();
-            if(partenaire == 0){
-                $table.bootstrapTable('refreshOptions', {url: "{{url('operation', ['action' => 'list-operations-partenairs'])}}"});
+        $("#searchByBank").change(function (e) {
+            var bank = $("#searchByBank").val();
+            if(bank == 0){
+                $table.bootstrapTable('refreshOptions', {url: "{{url('operation', ['action' => 'list-operations-banks'])}}"});
             }else{
-                $table.bootstrapTable('refreshOptions', {url: '../operation/list-operations-by-partenairs/' + partenaire});
+                $table.bootstrapTable('refreshOptions', {url: '../operation/list-operations-by-banks/' + bank});
             }
         });
-
+        
         $("#btnModalAjout").on("click", function () {
-            $("#partenair_id").val('').trigger('change');
-            $("#contact_partenair").val('');
+            $("#bank_id").val('').trigger('change');
+            $("#contact_bank").val('');
         });
 
         $("#formAjout").submit(function (e) {
@@ -307,9 +307,9 @@
         $("#state").val(operation.state);
         $("#dateOperation").val(operation.dateOperation);
         $("#receptionist").val(operation.receptionist);
-        $("#id_card_receptionist").val(operation.id_card_receptionist);
+        $("#reference").val(operation.reference);
         $("#observation").val(operation.observation);
-        $("#partenair_id").val(operation.partenair_id).trigger('change');
+        $("#bank_id").val(operation.bank_id).trigger('change');
     
         $(".bs-modal-ajout").modal("show");
     }
@@ -337,19 +337,14 @@
         }
     }
     function typeFormatter(type){
-        if(type == "deposit"){
-            return "<span class='text-success'>Dépôt<span>";
-        }
         if(type == "withdrawal"){
-            return "<span class='text-danger'>Retrait<span>";
+            return "<span class='text-danger'>Dépôt banque<span>";
+        }
+        if(type == "deposit"){
+            return "<span class='text-success'>Retrait banque<span>";
         }
     }
-    function printRow(idOperation){
-       window.open("recu-operation/" + idOperation ,'_blank')
-    }
-    function recuFormatter(id, row){
-        return '<a class="flaticon2-printer text-secondary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Imprimer" onClick="javascript:printRow(' + id + ');"></a>';
-    }
+ 
     function fileFormatter(file){
         return file ? "<a target='_blank' href='" + basePath + '/' + file + "'>Voir le document</a>" : "---";
     }
@@ -375,8 +370,8 @@
                         timer: 2500
                     });
                     document.forms["formAjout"].reset();
-                    $("#partenair_id").val('').trigger('change');
-                    $("#contact_partenair").val('');
+                    $("#bank_id").val('').trigger('change');
+                    $("#contact_bank").val('');
                     $table.bootstrapTable('refresh');
                 }
                 if (response.code === 0) {

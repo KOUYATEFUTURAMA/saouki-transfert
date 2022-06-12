@@ -27,10 +27,12 @@ class CreateOperationsTable extends Migration
             $table->integer("city_id")->nullable();
             $table->integer('caisse_ouverte_id')->unsigned();
             $table->integer("other_caisse_id")->nullable();
+            $table->integer("operation_id")->nullable();
             $table->integer("user_id")->nullable();
             $table->integer("authorized_by")->nullable();
             $table->dateTime("authorization_date")->nullable();
             $table->text("observation")->nullable();
+            $table->string("pattern")->nullable();
             $table->string("file_to_upload")->nullable();
             $table->timestamps();
         });

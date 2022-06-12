@@ -39,19 +39,51 @@ class CaisseOuverteController extends Controller
         if($caisseOuverte){
             $caisse = Caisse::find($caisseOuverte->caisse_id);
             $country = Country::find($caisse->country_id);
-            if($caisse->city){
-                $city = City::find($caisse->city);
+            if($caisse->city_id){
+                $city = City::find($caisse->city_id);
             }
         }
         
         $menuPrincipal = "Opération";
         $titleControlleur = "Caisse";
-        $btnModalAjout = ($caisseOuverte != null) ? "TRUE" : "FALSE";
+        $btnModalAjout = "FALSE";
 
         return view('operation.caisse.index', compact('caisse','caisseOuverte','country','city','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
+    public function findOpenCaisse($id){
+        $caisseOuverte = CaisseOuverte::with('user')
+                            ->select('caisse_ouvertes.*')
+                            ->where('caisse_ouvertes.id',$id)
+                            ->get();
 
+        $jsonData["rows"] = $caisseOuverte->toArray();
+        $jsonData["total"] = $caisseOuverte->count();
+        return response()->json($jsonData);
+    }
+
+    public function getCaisseInfosCloture($caisse){
+        $totalEntre = 0; $totalSortie = 0; 
+        $caisseOuverte = CaisseOuverte::join('operations','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
+                            ->select('operations.amount','operations.operation_type','caisse_ouvertes.*')
+                            ->where([['caisse_ouvertes.id',$caisse],['caisse_ouvertes.date_fermeture',NULL]])
+                            ->orderBy('id', 'DESC')
+                            ->get();
+        foreach ($caisseOuverte as $caisse) {
+            if($caisse->operation_type == "withdrawal"){
+                $totalSortie += $caisse->amount;
+            }else{
+                $totalEntre += $caisse->amount;
+            }
+        }
+        $jsonData["rows"] = $caisseOuverte->toArray();
+        $jsonData["totalEntre"] = $totalEntre;
+        $jsonData["totalSortie"] = $totalSortie;
+        return response()->json($jsonData);
+    }
+
+
+    /** Open caisse */
     public function openCaisse(Request $request){
         $jsonData = ["code" => 1, "msg" => "Ouverture effectuée avec succès."];
         if ($request->isMethod('post') && $request->input('caisse_id')) {
@@ -59,7 +91,6 @@ class CaisseOuverteController extends Controller
                 $data = $request->all();
 
             try {
-
                     //Si la caisse est déjà ouverte ou n'existe pas
                     $Caisse = Caisse::find($data['caisse_id']);
                     if ($Caisse->ouverte == 1 or !$Caisse) {
@@ -97,5 +128,57 @@ class CaisseOuverteController extends Controller
             }
         }
         return response()->json(["code" => 0, "msg" => "Saisie invalide", "data" => NULL]);
+    }
+
+    /**Close caisse */
+    /**
+    * Fermeture de la caisse
+    */
+    public function closeCaisse(Request $request){
+        
+        $jsonData = ["code" => 1, "msg" => "Ouverture effectuée avec succès."];
+        $data = $request->all();
+
+        $caisseOuverte = CaisseOuverte::find($data['caisse_a_fermer']);
+
+        if ($caisseOuverte && $caisseOuverte->date_fermeture == null) {
+
+            try {
+                    //On récupere la caisse pour fermer
+                    $caisse = Caisse::find($caisseOuverte->caisse_id);
+                    if ($caisse->ouverte == 0 or !$caisse) {
+                        return response()->json(["code" => 0, "msg" => "Cette caisse est déjà fermée ou n'existe pas", "data" => null]);
+                    }
+
+                    if($data['solde_fermeture'] < 0){
+                        return response()->json(["code" => 0, "msg" => "Vous avez un solde négatif ! Veillez contactez un administrateur", "data" => null]);
+                    }
+
+                    //Fermer caisse
+                    $caisse->ouverte = FALSE;
+                    $caisse->save();
+
+                    //Mise à jour caisse ouverte
+                    $caisseOuverte->solde_fermeture = $data['solde_fermeture'];
+                    $caisseOuverte->date_fermeture = now();
+                    $caisseOuverte->observation = isset($data["observation"]) ? $data["observation"] : NULL;
+                    $caisseOuverte->save();
+                    
+                    //Destruction de la session de caisse ouverte
+                    if ($request->session()->has('session_caisse_ouverte')) {
+                        $request->session()->forget('session_caisse_ouverte');
+                    }
+
+                    $jsonData["data"] = json_decode($caisseOuverte);
+                    return response()->json($jsonData);
+
+            } catch (Exception $exc) {
+                    $jsonData["code"] = -1;
+                    $jsonData["data"] = NULL;
+                    $jsonData["msg"] = $exc->getMessage();
+                    return response()->json($jsonData);
+            }
+        }
+        return response()->json(["code" => 0, "msg" => "Echec de fermeture", "data" => NULL]);
     }
 }

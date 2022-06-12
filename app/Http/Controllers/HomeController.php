@@ -24,7 +24,7 @@ class HomeController extends Controller
     public function admin()
     {
         $menuPrincipal = "Tableau de bord";
-        $titleControlleur = "";
+        $titleControlleur = "Administrateur";
         $btnModalAjout = "FALSE";
 
         return view('home-admin', compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
@@ -33,17 +33,25 @@ class HomeController extends Controller
     public function superviseur()
     {
         $menuPrincipal = "Tableau de bord";
-        $titleControlleur = "";
+        $titleControlleur = "Superviseur";
         $btnModalAjout = "FALSE";
 
         return view('home-superviseur',compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
     public function comptable()
     {
-        return view('home-comptable');
+        $menuPrincipal = "Tableau de bord";
+        $titleControlleur = "Comptable";
+        $btnModalAjout = "FALSE";
+
+        return view('home-comptable',compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
     public function agent()
     {
-        return view('home-agent');
+        $menuPrincipal = "Tableau de bord";
+        $titleControlleur = "Agent";
+        $btnModalAjout = "FALSE";
+
+        return view('home-agent',compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 }

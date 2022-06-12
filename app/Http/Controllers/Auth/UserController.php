@@ -29,7 +29,7 @@ class UserController extends Controller
     }
 
     public function profil(){
-        $user = User::with('agency','city')
+        $user = User::with('agency','city','country')
                     ->where('users.id', Auth::user()->id)
                     ->select('users.*',DB::raw('DATE_FORMAT(last_login_at, "%d-%m-%y à %H:%i") as last_login'),DB::raw('DATE_FORMAT(users.created_at, "%d-%m-%Y") as created'))
                     ->first();
@@ -41,7 +41,7 @@ class UserController extends Controller
     }
 
     public function listUser(){
-        $users = User::with('agency','city')
+        $users = User::with('agency','city','country')
                 ->select('users.*',DB::raw('DATE_FORMAT(last_login_at, "%d-%m-%Y à %H:%i:%s") as last_login'),DB::raw('DATE_FORMAT(created_at, "%d-%m-%Y à %H:%i") as created'))
                 ->where('users.id','!=',1)
                 ->orderBy('name','asc')
