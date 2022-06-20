@@ -15,6 +15,7 @@ class CreateTauxTransfertsTable extends Migration
     {
         Schema::create('taux_transferts', function (Blueprint $table) {
             $table->id();
+            $table->string("interval_ligne");
             $table->bigInteger("montant_minimum");
             $table->bigInteger("montant_maximum");
             $table->integer("montant_fixe")->nullable();

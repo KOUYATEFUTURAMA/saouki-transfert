@@ -65,6 +65,7 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::resource('customers', 'CustomerController');
     Route::get('list-customers', 'CustomerController@listCustomers');
     Route::get('list-customers-by-country/{country}', 'CustomerController@listCustomersByCountry');
+    Route::get('find-customer/{id}', 'CustomerController@findCustomer');
 
     //Route banks
     Route::resource('banks', 'BankController');
@@ -78,7 +79,7 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::get('find-partenair/{id}', 'PartenairController@findPartenair');
     Route::get('list-partenairs-by-country/{country}', 'PartenairController@listPartenairsByCountry');
 
-    //Route Taux transfert 
+    //Route Taux transfert
     Route::resource('taux-transferts', 'TauxTransfertController');
     Route::get('list-taux-transferts', 'TauxTransfertController@listTauxTransfert');
 });
@@ -116,6 +117,17 @@ Route::namespace('Operation')->middleware('auth')->name('operation.')->prefix('o
     Route::post('close-caisse', 'CaisseOuverteController@closeCaisse')->name('close-caisse');
     Route::get('find-open-caisse/{id}', 'CaisseOuverteController@findOpenCaisse');
     Route::get('get-caisse-infos-cloture/{id}', 'CaisseOuverteController@getCaisseInfosCloture');
+    Route::get('list-opened-caisses-by-agency/{agency}', 'CaisseOuverteController@listOpenedCaisseByAgency');
+
+    //Route send money 
+    Route::resource('send-money', 'SendMoneyController');
+    Route::get('list-send-money', 'SendMoneyController@listSendMoney');
+    Route::get('list-send-money-by-code/{code}', 'SendMoneyController@listSendMoneyByCode');
+    Route::get('list-send-money-by-sender/{sender}', 'SendMoneyController@listSendMoneyBySender');
+    Route::get('list-send-money-by-recipient/{recipient}', 'SendMoneyController@listSendMoneyByRecipient');
+    Route::get('list-send-money-by-destination/{destination}', 'SendMoneyController@listSendMoneyByDestination');
+    Route::get('list-send-money-by-state/{state}', 'SendMoneyController@listSendMoneyByState');
+    Route::get('list-send-money-by-date/{date}', 'SendMoneyController@listSendMoneyByDate');
 });
 
 //les routes du module Auth

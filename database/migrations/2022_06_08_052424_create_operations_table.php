@@ -19,7 +19,7 @@ class CreateOperationsTable extends Migration
             $table->string("operation_type"); //withdrawal or deposit
             $table->bigInteger("amount");
             $table->dateTime("date");
-            $table->string("state"); //0 : recorded, 1 : authorized, 2 : unauthorized 
+            $table->string("state"); //recorded, authorized, unauthorized, sent, withdrawn 
             $table->integer("partenair_id")->nullable();
             $table->string("receptionist")->nullable();
             $table->string("id_card_receptionist")->nullable();
@@ -27,7 +27,10 @@ class CreateOperationsTable extends Migration
             $table->integer("city_id")->nullable();
             $table->integer('caisse_ouverte_id')->unsigned();
             $table->integer("other_caisse_id")->nullable();
+            $table->integer("agency_id")->nullable();
             $table->integer("operation_id")->nullable();
+            $table->integer("send_money_id")->nullable();
+            $table->integer("withdrawal_money_id")->nullable();
             $table->integer("user_id")->nullable();
             $table->integer("authorized_by")->nullable();
             $table->dateTime("authorization_date")->nullable();

@@ -17,8 +17,9 @@ class CreateCaisseOuvertesTable extends Migration
             $table->id();
             $table->bigInteger('montant_ouverture')->unsigned();
             $table->bigInteger('solde_fermeture')->unsigned()->default(0);
-            $table->bigInteger('entree')->unsigned()->default(0);
-            $table->bigInteger('sortie')->unsigned()->default(0);
+            $table->bigInteger('total_entree')->unsigned()->default(0);
+            $table->bigInteger('total_sortie')->unsigned()->default(0);
+            $table->bigInteger('total_remise')->unsigned()->default(0);
             $table->integer('caisse_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->text('observation')->nullable();

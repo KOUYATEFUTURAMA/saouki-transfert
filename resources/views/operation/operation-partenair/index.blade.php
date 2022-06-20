@@ -111,14 +111,21 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group mt-10">
+                                        @if(Auth::user()->role == "Superviseur")
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="deposit" value="deposit" ng-model="operation.operation_type" ng-checked="operation.operation_type!='withdrawal'"/>
                                         &nbsp;D&eacute;p&ocirc;t</label>
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                         <label for="operation_type">
-                                        <input type="radio" name="operation_type" id="operation_type" value="withdrawal" ng-model="operation.operation_type" ng-checked="operation.operation_type=='withdrawal'"/>
+                                            <input type="radio" name="operation_type" id="withdrawal" value="withdrawal" ng-model="operation.operation_type" ng-checked="operation.operation_type=='withdrawal'"/>
+                                            &nbsp;Retrait</label>
+                                        @endif
+                                        @if(Auth::user()->role == "Comptable")
+                                        <label for="operation_type">
+                                        <input type="radio" checked="checked" name="operation_type" id="operation_type" value="withdrawal"/>
                                         &nbsp;Retrait</label>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -133,8 +140,10 @@
                                         <div class="input-group">
                                             <select class="form-control" id="state" name="state" required>
                                                 <option value="recorded"> Enregistr&eacute;e </option>
+                                                @if(Auth::user()->role == "Superviseur")
                                                 <option value="authorized"> Autoris&eacute;e </option>
                                                 <option value="unauthorized"> Annul&eacute;e</option>
+                                                @endif
                                             </select>
                                         </div>
                                     </div>
@@ -326,8 +335,8 @@
         return Intl.NumberFormat().format(amount);
     }
     function stateFormatter(id, row){
-        if(row.state == "recorded"){
-            return "<span>En attente de validation<span>";
+        if(row.state == "recorded" && row.operation_type == "withdrawal"){
+            return "<span>En attente d'autorisation<span>";
         }
         if(row.state == "authorized"){
             return "<span class='text-success'>Autorisée le "+row.authorizationDate+" par " + row.authorized_by.name + "<span>";

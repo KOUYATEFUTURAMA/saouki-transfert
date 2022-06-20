@@ -14,7 +14,7 @@ class TauxTransfertController extends Controller
 
         $menuPrincipal = "Paramètre";
         $titleControlleur = "Taux de transfert";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = "FALSE";
 
         if(Auth::user()->role == "Administrateur"){
             return view('parametre.taux-transfert.index', compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
@@ -25,9 +25,9 @@ class TauxTransfertController extends Controller
 
     public function listTauxTransfert(){
         $tauxTransferts = TauxTransfert::select('taux_transferts.*')
-                            ->orderBy('montant_minimum', 'ASC')
+                            ->orderBy('interval_ligne', 'ASC')
                             ->get();
-
+        
         $jsonData["rows"] = $tauxTransferts->toArray();
         $jsonData["total"] = $tauxTransferts->count();
         return response()->json($jsonData);
@@ -57,6 +57,7 @@ class TauxTransfertController extends Controller
                 }
 
                 $tauxTransfert = $data['id'] ? TauxTransfert::findOrFail($data['id']) : new TauxTransfert;
+                $tauxTransfert->interval_ligne = $data['interval_ligne'];
                 $tauxTransfert->montant_minimum = $data['montant_minimum'];
                 $tauxTransfert->montant_maximum = $data['montant_maximum'];
                 $tauxTransfert->montant_fixe = isset($data['montant_fixe']) ? $data['montant_fixe'] : NULL;

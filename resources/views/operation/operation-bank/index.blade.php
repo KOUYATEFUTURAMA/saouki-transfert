@@ -46,10 +46,9 @@
                                     <th data-field="libelle_country">Zone</th>
                                     <th data-field="receptionist">Mandataire</th>
                                     <th data-field="receptionist" data-visible="false">Carte d'identit&eacute; Mandataire</th>
-                                    <th data-formatter="stateFormatter">Etat</th>
                                     <th data-field="user.name" data-visible="false">Caissier</th>
                                     <th data-field="observation" data-visible="false">Observation</th>
-                                    <th data-field="file_to_upload" data-formatter="fileFormatter" data-visible="false">Document</th>
+                                    <th data-field="file_to_upload" data-formatter="fileFormatter">Document</th>
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
                                 </tr>
                             </thead>
@@ -73,6 +72,7 @@
                         </div>
                         <div class="modal-body">
                             <input type="text" ng-hide="true" name="id" id="id">
+                            <input type="text" ng-hide="true" name="state" id="state" value="authorized">
                             @csrf
                             <div class="row">
                                 <div class="col-md-5">
@@ -109,7 +109,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <div class="form-group mt-10">
                                         <label for="operation_type">
                                         <input type="radio" name="operation_type" id="deposit" value="deposit" ng-model="operation.operation_type" ng-checked="operation.operation_type!='withdrawal'"/>
@@ -121,22 +121,10 @@
                                         &nbsp;D&eacute;p&ocirc;t banque</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Montant *</label>
                                         <input type="number" class="form-control" name="amount" id="amount" placeholder="Montat" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="partenair_id">Etat de l'op&eacute;ration *</label>
-                                        <div class="input-group">
-                                            <select class="form-control" id="state" name="state" required>
-                                                <option value="recorded"> Enregistr&eacute;e </option>
-                                                <option value="authorized"> Autoris&eacute;e </option>
-                                                <option value="unauthorized"> Annul&eacute;e</option>
-                                            </select>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -6,6 +6,7 @@ use App\Models\Parametre\Bank;
 use App\Models\Parametre\City;
 use App\Models\Parametre\Partenair;
 use App\Models\Operation\CaisseOuverte;
+use App\Models\Parametre\Agency;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,8 +23,11 @@ class Operation extends Model
         'bank_id',
         'city_id',
         'other_caisse_id',
+        'agency_id',
         'operation_id',
         'caisse_ouverte_id',
+        'send_money_id',
+        'withdrawal_money_id',
         'user_id',
         'authorized_by',
         'observation',
@@ -45,12 +49,8 @@ class Operation extends Model
         return $this->belongsTo(City::class,'city_id');
     }
 
-    public function caisse_ouverte(){
-        return $this->belongsTo(CaisseOuverte::class,'caisse_ouverte_id');
-    }
-
-    public function other_caisse(){
-        return $this->belongsTo(CaisseOuverte::class,'other_caisse_id');
+    public function agency(){
+        return $this->belongsTo(Agency::class,'agency_id');
     }
 
     public function user(){

@@ -1,4 +1,4 @@
-<li class="menu-item menu-item-submenu {{request()->is('operation/*') ? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
+<li class="menu-item menu-item-submenu {{request()->is('operation/*') && !request()->is('operation/caisse-ouvertes')? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
     <a href="javascript:;" class="menu-link menu-toggle">
         <span class="svg-icon menu-icon">
             <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Layers.svg-->
@@ -20,36 +20,28 @@
     <div class="menu-submenu">
         <i class="menu-arrow"></i>
         <ul class="menu-subnav">
-            <li class="menu-item {{Route::currentRouteName() === 'operation.caisse-ouvertes.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
-                <a href="{{route('operation.caisse-ouvertes.index')}}" class="menu-link">
-                    <i class="menu-bullet menu-bullet-dot">
-                        <span></span>
-                    </i>
-                    <span class="menu-text">Op&eacute;ration des caisse</span>
-                </a>
-            </li>
-            <li class="menu-item {{Route::currentRouteName() === 'operation.operations-partenairs' ? 'menu-item-active' : ''}}" aria-haspopup="true">
-                <a href="{{route('operation.operations-partenairs')}}" class="menu-link">
-                    <i class="menu-bullet menu-bullet-dot">
-                        <span></span>
-                    </i>
-                    <span class="menu-text">Op&eacute;ration partenaire</span>
-                </a>
-            </li>
-            <li class="menu-item {{Route::currentRouteName() === 'operation.operations-banks' ? 'menu-item-active' : ''}}" aria-haspopup="true">
-                <a href="{{route('operation.operations-banks')}}" class="menu-link">
-                    <i class="menu-bullet menu-bullet-dot">
-                        <span></span>
-                    </i>
-                    <span class="menu-text">Op&eacute;rations de banque</span>
-                </a>
-            </li>
             <li class="menu-item {{Route::currentRouteName() === 'operation.decaissement-encaissement' ? 'menu-item-active' : ''}}" aria-haspopup="true">
                 <a href="{{route('operation.decaissement-encaissement')}}" class="menu-link">
                     <i class="menu-bullet menu-bullet-dot">
                         <span></span>
                     </i>
                     <span class="menu-text">D&eacute;caiss. - Encaiss.</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'operation.send-money.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('operation.send-money.index')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Envoie d'argent</span>
+                </a>
+            </li>
+            <li class="menu-item" aria-haspopup="true">
+                <a href="" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Retrait d'argent</span>
                 </a>
             </li>
         </ul>

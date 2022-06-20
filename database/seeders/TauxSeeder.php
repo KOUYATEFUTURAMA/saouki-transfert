@@ -16,6 +16,7 @@ class TauxSeeder extends Seeder
     {
         DB::table('taux_transferts')->insert([
             [
+                'interval_ligne' => 'Intervale 1',
                 'montant_minimum' => 5000,
                 'montant_maximum' => 300000,
                 'montant_fixe' => 0,
@@ -23,6 +24,7 @@ class TauxSeeder extends Seeder
                 'created_at' => now(),
             ],
             [
+                'interval_ligne' => 'Intervale 2',
                 'montant_minimum' => 300001,
                 'montant_maximum' => 500000,
                 'montant_fixe' => 0,
@@ -30,6 +32,7 @@ class TauxSeeder extends Seeder
                 'created_at' => now(),
             ],
             [
+                'interval_ligne' => 'Intervale 3',
                 'montant_minimum' => 500001,
                 'montant_maximum' => 1000000,
                 'montant_fixe' => 6000,

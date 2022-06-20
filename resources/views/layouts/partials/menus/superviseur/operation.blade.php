@@ -1,4 +1,4 @@
-<li class="menu-item menu-item-submenu {{request()->is('operation/*') ? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
+<li class="menu-item menu-item-submenu {{request()->is('operation/*') && !request()->is('operation/caisse-ouvertes') ? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
     <a href="javascript:;" class="menu-link menu-toggle">
         <span class="svg-icon menu-icon">
             <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Layers.svg-->
@@ -20,20 +20,12 @@
     <div class="menu-submenu">
         <i class="menu-arrow"></i>
         <ul class="menu-subnav">
-            <li class="menu-item {{Route::currentRouteName() === 'operation.caisse-ouvertes.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
-                <a href="{{route('operation.caisse-ouvertes.index')}}" class="menu-link">
-                    <i class="menu-bullet menu-bullet-dot">
-                        <span></span>
-                    </i>
-                    <span class="menu-text">Op&eacute;ration des caisse</span>
-                </a>
-            </li>
             <li class="menu-item {{Route::currentRouteName() === 'operation.operations-partenairs' ? 'menu-item-active' : ''}}" aria-haspopup="true">
                 <a href="{{route('operation.operations-partenairs')}}" class="menu-link">
                     <i class="menu-bullet menu-bullet-dot">
                         <span></span>
                     </i>
-                    <span class="menu-text">Op&eacute;ration partenaire</span>
+                    <span class="menu-text">Op&eacute;rations des partenaire</span>
                 </a>
             </li>
             <li class="menu-item {{Route::currentRouteName() === 'operation.operations-banks' ? 'menu-item-active' : ''}}" aria-haspopup="true">

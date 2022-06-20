@@ -121,8 +121,17 @@
 									</a>
 								</li>
                                 <li class="h-20px"></li>
-                                @if(Auth::user()->role == 'Superviseur' OR Auth::user()->role == 'Comptable')
-                                    @include('layouts.partials.menus.comptable-superviseur.operation')
+                                @if(Auth::user()->role == 'Agent')
+                                @include('layouts.partials.menus.agent.index')
+                                @include('layouts.partials.menus.agent.operation')
+                                @endif
+                                @if(Auth::user()->role == 'Superviseur')
+                                    @include('layouts.partials.menus.superviseur.index')
+                                    @include('layouts.partials.menus.superviseur.operation')
+                                @endif
+                                @if(Auth::user()->role == 'Comptable')
+                                    @include('layouts.partials.menus.comptable.index')
+                                    @include('layouts.partials.menus.comptable.operation')
                                 @endif
                                 @if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
                                     @include('layouts.partials.menus.admin.parametre')

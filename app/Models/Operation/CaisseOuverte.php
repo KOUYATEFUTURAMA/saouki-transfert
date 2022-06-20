@@ -11,8 +11,9 @@ class CaisseOuverte extends Model
     protected $fillable = [
         'montant_ouverture',
         'solde_fermeture',
-        'entree',
-        'sortie',
+        'total_entree',
+        'total_sortie',
+        'total_remise',
         'caisse_id',
         'user_id',
         'observation',

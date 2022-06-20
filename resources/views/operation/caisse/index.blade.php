@@ -34,16 +34,23 @@
                 <div class="col-md-4">
                     <div class="alert alert-custom alert-outline-warning fade show mb-2" role="alert">
                         <div class="alert-text">
+                            @if($country)
                             <h4>
-                                Pays : @if($country)
-                                        <span class="text-dark">{{$country->libelle_country}}</span>
-                                        @endif
-                            </h4><br/>
-                            <h4>
-                                Zone : @if($city)
-                                            <span class="text-dark">{{$city->libelle_city}}</span>
-                                        @endif
+                                Pays : <span class="text-dark">{{$country->libelle_country}}</span>
                             </h4>
+                            @endif
+                            @if($city)
+                                <br/>
+                                <h4>
+                                    Zone : <span class="text-dark">{{$city->libelle_city}}</span>
+                                </h4>
+                            @endif
+                            @if($agency)
+                                <br/>
+                                <h4>
+                                    Agence : <span class="text-dark">{{$agency->libelle_agency}}</span>
+                                </h4>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -56,7 +63,9 @@
                                         @endif
                             </h4><br/>
                             <h4>
-                                Caissier : <span class="text-dark">{{Auth::user()->name}}</span>
+                                Caissier :  @if($caisseOuverte)
+                                <span class="text-dark">{{Str::limit(Auth::user()->name, 15, '...')}}</span>
+                                @endif
                             </h4>
                         </div>
                     </div>
@@ -94,7 +103,7 @@
                     </div>
                 </div>
                 <div class="row mt-5">
-                    <div class="col-xl-3">
+                    <div class="col-xl-4">
                         <div class="form-group">
                             <label for="centre">Rechercher par N° ref.</label>
                             <div class="input-group input-group-sm">
@@ -102,7 +111,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3">
+                    <div class="col-xl-4">
                         <div class="form-group">
                             <label for="centre">Rechercher par type</label>
                             <select class="form-control" id="searchByType">
@@ -112,18 +121,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-xl-3">
-                        <div class="form-group">
-                            <label for="centrer">Rechercher par etat</label>
-                            <select class="form-control" id="searchByState">
-                                <option value="0"> Tous</option>
-                                <option value="recorded"> Enregistr&eacute;e </option>
-                                <option value="authorized"> Autoris&eacute;e </option>
-                                <option value="unauthorized"> Annul&eacute;e</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-xl-3">
+                    <div class="col-xl-4">
                         <div class="form-group">
                             <label for="centrer">Rechercher par concern&eacute;</label>
                             <select class="form-control" id="searchByConcerne">
@@ -131,6 +129,10 @@
                                 <option value="partenair_id"> Partenaire</option>
                                 <option value="bank_id"> Banque </option>
                                 <option value="other_caisse_id"> Encaiss - Decaiss</option>
+                                @if(Auth::user()->role=="Agent")
+                                <option value="send_money_id"> Envoie d'argent</option>
+                                <option value="withdrawal_money_id"> Retrait d'argent</option>
+                                @endif
                             </select>
                         </div>
                     </div>
@@ -251,7 +253,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="alert alert-custom alert-outline-warning fade show mb-2" role="alert">
-                                        <div class="text-danger  mb-4">
+                                        <div class="text-success  mb-4">
                                             <h2><br/><br/>
                                                 Solde : <span class="mr-2" id="solde"> 0</span> F CFA 
                                                 <input type="hidden" id="solde_fermeture" name="solde_fermeture">
@@ -287,6 +289,7 @@
     <input type="hidden" id="role" value="{{Auth::user()->role}}">
     <input type="hidden" id="country_id" value="{{Auth::user()->country_id}}">
     <input type="hidden" id="city_id" value="{{Auth::user()->city_id}}">
+    <input type="hidden" id="agency_id" value="{{Auth::user()->agency_id}}">
     <script type="text/javascript">
         var $table = jQuery("#table"), rows = [];
         
@@ -381,6 +384,15 @@
                     });
                 })
             }
+            if(role == 'Agent'){
+                var agency = $("#agency_id").val();
+                $.getJSON("../parametre/list-caisses-by-agency/" + agency, function (reponse) {
+                    $("#caisse_id").html("<option value=''>Sélectionner votre caisse</option>");
+                    $.each(reponse.rows, function (index, caisse) { 
+                        $("#caisse_id").append("<option value="+caisse.id+">"+caisse.libelle_caisse+"</option>")
+                    });
+                })
+            }
             $(".bs-modal-open-caisse").modal("show");
         }
         function fermetureCaisse(){
@@ -414,7 +426,7 @@
                 return "<span>"+row.bank.libelle_bank+"<span>";
             }
             if(row.other_caisse_id){
-                return row.operation_type == "deposit" ? "<span>Décaissement<span>" : "<span>Encaissement<span>";
+                return row.operation_type == "deposit" ? "<span>Encaissement<span>" : "<span>Décaissement<span>";
             }
             if(row.partenair_id){
                 return "<span>Partenaire " + row.partenair.name + "<span>";
@@ -432,14 +444,12 @@
             return Intl.NumberFormat().format(amount);
         }
         function stateFormatter(id, row){
-            if(row.state == "recorded"){
+            if(row.state == "recorded" && row.partenair_id!=null && row.operation_type=="withdrawal"){
                 return "<span>En attente de validation<span>";
-            }
-            if(row.state == "authorized"){
+            } else if (row.state == "authorized" && row.partenair_id!=null){
                 return "<span class='text-success'>Autorisée le "+row.authorizationDate+" par " + row.authorized_by.name + "<span>";
-            }
-            if(row.state == "unauthorized"){
-                return "<span class='text-danger'>Anulée<span>";
+            }else {
+                return "---";
             }
         }
         function fileFormatter(file){

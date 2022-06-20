@@ -210,9 +210,15 @@
 
         $("#role").change(function (e) {
             var role = $("#role").val();
-            if(role == "Administrateur" || role == "Gerant" || role == "Superviseur"){
+            if(role == "Administrateur" || role == "Gerant"){
                 $(".city_row, .agency_row, .country_row").hide();
                 $("#city_id, #agency_id, #country_id").removeAttr('required');
+            }
+            if(role == "Superviseur"){
+                $(".agency_row, .city_row").hide();
+                $(".country_row").show();
+                $("#country_id").attr('required', ''); 
+                $("#city_id, #agency_id").removeAttr('required');
             }
             if(role == "Comptable"){
                 $(".agency_row").hide();
@@ -287,12 +293,26 @@
         $("#contact").val(user.contact);
         $("#role").val(user.role);
 
-        if(user.country_id!=null && user.city_id!=null && user.agency_id==null){
+        if(user.role == "Administrateur" || user.role == "Gerant"){
+            $(".city_row, .agency_row, .country_row").hide();
+            $("#city_id, #agency_id, #country_id").removeAttr('required');
+            $("#country_id").html("<option value=''> Sélectionner le pays</option>");
+            $("#city_id").html("<option value=''> Sélectionner la ville</option>");
+            $("#agency_id").html("<option value=''> Sélectionner l'agence</option>");
+        }
+        if(user.role == "Superviseur"){
+            $(".agency_row, .city_row").hide();
+            $(".country_row").show();
+            $("#country_id").attr('required', ''); 
+            $("#city_id, #agency_id").removeAttr('required');
+            $("#city_id").html("<option value=''> Sélectionner la ville</option>");
+            $("#agency_id").html("<option value=''> Sélectionner l'agence</option>");
+            $("#country_id").val(user.country_id).trigger('change');
+        }
+        if(user.role == "Comptable"){
             $(".agency_row").hide();
             $(".city_row, .country_row").show();
             $("#city_id, #country_id").attr('required', ''); 
-            $("#agency_id").removeAttr('required');
-            $("#agency_id").html("<option value=''> Sélectionner l'agence</option>");
             $("#country_id").val(user.country_id).trigger('change');
 
             //Get cities and find city by country
@@ -303,8 +323,9 @@
                 });
                 $("#city_id").val(user.city_id).trigger('change');
             });
-            $("#agency_id").val("").trigger('change');
-        }else if(user.country_id!=null && user.city_id!=null && user.agency_id!=null){
+            $("#agency_id").html("<option value=''> Sélectionner l'agence</option>");
+        }
+        if(user.role == "Agent"){
             $(".city_row, .country_row, .agency_row").show();
             $("#city_id, #country_id, #agency_id").attr('required', ''); 
             $("#country_id").val(user.country_id).trigger('change');
@@ -317,7 +338,6 @@
                 });
                 $("#city_id").val(user.city_id);
             });
-
             //Get agencies and find agency by city
             $.getJSON("../parametre/list-agencies-by-city/" + user.city_id, function (reponse) {
                 $("#city_id").html("<option value=''> Selectionner l'agence </option>")
@@ -326,12 +346,8 @@
                 });
                 $("#agency_id").val(user.agency_id).trigger('change');
             });
-        }else{
-            $(".city_row, .agency_row, .country_row").hide();
-            $("#city_id, #agency_id, #country_id").removeAttr('required');
-            $("#city_id").html("<option value=''> Sélectionner la ville</option>");
-            $("#agency_id").html("<option value=''> Sélectionner l'agence</option>");
         }
+
         $(".bs-modal-ajout").modal("show");
     }
 
@@ -367,6 +383,7 @@
                             showConfirmButton: false,
                             timer: 2500
                         });
+                        $("#country_id").val("").trigger('change');
                         $(".city_row, .agency_row, .country_row").hide();
                         $("#city_id, #agency_id, #country_id").removeAttr('required');
                         $("#city_id").html("<option value=''> Sélectionner la ville</option>");

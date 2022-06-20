@@ -21,6 +21,7 @@
                             data-show-toggle="false">
                             <thead>
                                 <tr role="row">
+                                    <th data-field="interval_ligne">Interval</th>
                                     <th data-field="montant_minimum" data-formatter="montantFormatter">Montant minimum</th>
                                     <th data-field="montant_maximum" data-formatter="montantFormatter">Montant maximum</th>
                                     <th data-field="montant_fixe" data-formatter="montantFormatter">Montant fixe</th>
@@ -49,6 +50,14 @@
                         <div class="modal-body">
                             <input type="text" ng-hide="true" name="id" id="id">
                             @csrf
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>Interval *</label>
+                                        <input type="text" class="form-control" name="interval_ligne" id="interval_ligne" placeholder="Interval 1" required>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -178,6 +187,7 @@
             $scope.populateForm(taux);
         });
         $("#id").val(taux.id);
+        $("#interval_ligne").val(taux.interval_ligne);
         $("#montant_minimum").val(taux.montant_minimum);
         $("#montant_maximum").val(taux.montant_maximum);
         $("#montant_fixe").val(taux.montant_fixe);
@@ -186,8 +196,7 @@
         }else{
             $("#taux").val("");
         }
-       
-    
+        $('#interval_ligne, #montant_minimum, #montant_maximum').prop('readOnly', true);
         $(".bs-modal-ajout").modal("show");
     }
 
@@ -209,7 +218,7 @@
     }
 
     function optionFormatter(id, row) {
-        return '<a class="flaticon2-pen text-primary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"></a>\n\<a class="flaticon-delete text-danger cursor-pointer ml-2" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"></a>';
+        return '<a class="flaticon2-pen text-primary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');">';
     }
 </script>
 @endsection

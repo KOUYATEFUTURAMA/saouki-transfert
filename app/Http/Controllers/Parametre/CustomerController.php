@@ -52,6 +52,16 @@ class CustomerController extends Controller
         return response()->json($jsonData);
     }
 
+    public function findCustomer($id){
+        $customer = Customer::select('customers.*')
+                            ->where('id',$id)
+                            ->get();
+
+        $jsonData["rows"] = $customer->toArray();
+        $jsonData["total"] = $customer->count();
+        return response()->json($jsonData);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

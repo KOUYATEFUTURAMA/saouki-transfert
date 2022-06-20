@@ -10,6 +10,7 @@ use App\Models\Parametre\Country;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Operation\CaisseOuverte;
+use App\Models\Parametre\Agency;
 
 class CaisseOuverteController extends Controller
 {
@@ -21,7 +22,7 @@ class CaisseOuverteController extends Controller
     public function index(Request $request)
     {
         $caisseOuverte = null; $caisse = NULL;  $authUser = Auth::user(); $country = null;
-        $city = null;
+        $city = null; $agency = null;
         
         //Recupértion de la caisse dans la session
         if($request->session()->has('session_caisse_ouverte')){
@@ -42,20 +43,27 @@ class CaisseOuverteController extends Controller
             if($caisse->city_id){
                 $city = City::find($caisse->city_id);
             }
+            if($caisse->agency_id){
+                $agency = Agency::find($caisse->agency_id);
+            }
         }
         
         $menuPrincipal = "Opération";
         $titleControlleur = "Caisse";
         $btnModalAjout = "FALSE";
 
-        return view('operation.caisse.index', compact('caisse','caisseOuverte','country','city','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        return view('operation.caisse.index', compact('caisse','caisseOuverte','country','city','agency','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
     public function findOpenCaisse($id){
         $caisseOuverte = CaisseOuverte::with('user')
-                            ->select('caisse_ouvertes.*')
-                            ->where('caisse_ouvertes.id',$id)
-                            ->get();
+                        ->join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')
+                        ->leftjoin('countries','countries.id','=','caisses.country_id')
+                        ->leftjoin('cities','cities.id','=','caisses.city_id')
+                        ->leftjoin('agencies','agencies.id','=','caisses.agency_id')
+                        ->select('caisse_ouvertes.*','agencies.libelle_agency','cities.libelle_city','countries.libelle_country')
+                        ->where('caisse_ouvertes.id',$id)
+                        ->get();
 
         $jsonData["rows"] = $caisseOuverte->toArray();
         $jsonData["total"] = $caisseOuverte->count();
@@ -64,11 +72,12 @@ class CaisseOuverteController extends Controller
 
     public function getCaisseInfosCloture($caisse){
         $totalEntre = 0; $totalSortie = 0; 
+
         $caisseOuverte = CaisseOuverte::join('operations','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
-                            ->select('operations.amount','operations.operation_type','caisse_ouvertes.*')
-                            ->where([['caisse_ouvertes.id',$caisse],['caisse_ouvertes.date_fermeture',NULL]])
-                            ->orderBy('id', 'DESC')
-                            ->get();
+                        ->select('operations.amount','operations.operation_type','caisse_ouvertes.*')
+                        ->where([['operations.caisse_ouverte_id',$caisse],['caisse_ouvertes.date_fermeture',NULL]])
+                        ->get();
+
         foreach ($caisseOuverte as $caisse) {
             if($caisse->operation_type == "withdrawal"){
                 $totalSortie += $caisse->amount;
@@ -76,12 +85,24 @@ class CaisseOuverteController extends Controller
                 $totalEntre += $caisse->amount;
             }
         }
+      
         $jsonData["rows"] = $caisseOuverte->toArray();
         $jsonData["totalEntre"] = $totalEntre;
         $jsonData["totalSortie"] = $totalSortie;
         return response()->json($jsonData);
     }
 
+    public function listOpenedCaisseByAgency($agency){
+        $caisseOuvertes = CaisseOuverte::join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')
+                        ->select('libelle_caisse','caisse_ouvertes.id')
+                        ->where([['caisse_ouvertes.date_fermeture',NULL],['user_id','!=',Auth::user()->id],['caisses.agency_id',$agency],['caisses.ouverte',1]])
+                        ->orderBy('libelle_caisse', 'ASC')
+                        ->get();
+
+        $jsonData["rows"] = $caisseOuvertes->toArray();
+        $jsonData["total"] = $caisseOuvertes->count();
+        return response()->json($jsonData);
+    }
 
     /** Open caisse */
     public function openCaisse(Request $request){
