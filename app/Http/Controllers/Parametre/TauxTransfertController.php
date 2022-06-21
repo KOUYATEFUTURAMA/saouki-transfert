@@ -14,9 +14,9 @@ class TauxTransfertController extends Controller
 
         $menuPrincipal = "Paramètre";
         $titleControlleur = "Taux de transfert";
-        $btnModalAjout = "FALSE";
+        $btnModalAjout = Auth::user()->role == "Administrateur" ? "TRUE" : "FALSE";
 
-        if(Auth::user()->role == "Administrateur"){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
             return view('parametre.taux-transfert.index', compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
         }else{
             return abort(404);

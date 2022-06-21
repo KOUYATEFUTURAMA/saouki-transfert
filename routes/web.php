@@ -121,13 +121,22 @@ Route::namespace('Operation')->middleware('auth')->name('operation.')->prefix('o
 
     //Route send money 
     Route::resource('send-money', 'SendMoneyController');
+    Route::get('find-send-money/{id}', 'SendMoneyController@findSendMoney');
     Route::get('list-send-money', 'SendMoneyController@listSendMoney');
     Route::get('list-send-money-by-code/{code}', 'SendMoneyController@listSendMoneyByCode');
     Route::get('list-send-money-by-sender/{sender}', 'SendMoneyController@listSendMoneyBySender');
-    Route::get('list-send-money-by-recipient/{recipient}', 'SendMoneyController@listSendMoneyByRecipient');
     Route::get('list-send-money-by-destination/{destination}', 'SendMoneyController@listSendMoneyByDestination');
     Route::get('list-send-money-by-state/{state}', 'SendMoneyController@listSendMoneyByState');
     Route::get('list-send-money-by-date/{date}', 'SendMoneyController@listSendMoneyByDate');
+    Route::get('recu-money-send/{id}', 'SendMoneyController@recuMoneySend');
+
+    //Route withdrawal of money  
+    Route::resource('withdrawal-money', 'WithdrawalMoneyController');
+    Route::get('list-withdrawal-money', 'WithdrawalMoneyController@listWithdrawalMoney');
+    Route::get('list-withdrawal-money-by-country/{country}', 'WithdrawalMoneyController@listWithdrawalMoneyByCountry');
+    Route::get('list-withdrawal-money-by-user/{user}', 'WithdrawalMoneyController@listWithdrawalMoneyByUser');
+    Route::get('list-withdrawal-money-by-periode/{start}/{end}', 'WithdrawalMoneyController@listWithdrawalMoneyByPeriode');
+    Route::get('recu-withdrawal-money/{id}', 'WithdrawalMoneyController@recuWithdrawalMoney');
 });
 
 //les routes du module Auth

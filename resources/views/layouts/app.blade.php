@@ -36,7 +36,7 @@
         </script>
         @php
             $home = '';
-            if(Auth::user()->role == "Administrateur") {
+            if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant") {
                 $home = 'home-admin';
             }
             if(Auth::user()->role == "Superviseur") {
@@ -45,9 +45,6 @@
             if(Auth::user()->role == "Comptable") {
                 $home = 'home-comptable';
             } 
-            if(Auth::user()->role == "Gerant") {
-                $home = 'home-gerant';
-            }
             if(Auth::user()->role == "Agent") {
                 $home = 'home-agent';
             } 
@@ -124,18 +121,22 @@
                                 @if(Auth::user()->role == 'Agent')
                                 @include('layouts.partials.menus.agent.index')
                                 @include('layouts.partials.menus.agent.operation')
+                                @include('layouts.partials.menus.agent.etat')
                                 @endif
                                 @if(Auth::user()->role == 'Superviseur')
                                     @include('layouts.partials.menus.superviseur.index')
                                     @include('layouts.partials.menus.superviseur.operation')
+                                    @include('layouts.partials.menus.superviseur.etat')
                                 @endif
                                 @if(Auth::user()->role == 'Comptable')
                                     @include('layouts.partials.menus.comptable.index')
                                     @include('layouts.partials.menus.comptable.operation')
+                                    @include('layouts.partials.menus.comptable.etat')
                                 @endif
                                 @if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
                                     @include('layouts.partials.menus.admin.parametre')
                                     @include('layouts.partials.menus.admin.operation')
+                                    @include('layouts.partials.menus.admin.etat')
                                     <li class="menu-item {{Route::currentRouteName() === 'auth.users.index' || Route::currentRouteName() === 'auth.user.profil' ? 'menu-item-active' : ''}}" aria-haspopup="true">
                                         <a href="{{ route('auth.users.index') }}" class="menu-link">
                                             <span class="svg-icon menu-icon">

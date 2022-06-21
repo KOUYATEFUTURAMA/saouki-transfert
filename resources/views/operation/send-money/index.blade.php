@@ -22,8 +22,11 @@
                             data-show-toggle="false">
                             <thead>
                                 <tr role="row">
+                                    @if(Auth::user()->role == "Agent")
+                                    <th data-field="id" data-formatter="recuFormatter">re&ccedil;u</th>
+                                    @endif
                                     <th data-field="sendDate">Date</th>
-                                    <th data-field="secret_code" data-search="true">R&eacute;f&eacute;rence</th>
+                                    <th data-field="secret_code" data-search="true">Code secret</th>
                                     <th data-field="amount" data-formatter="amountFormatter">Montant</th>
                                     <th data-field="shipping_cost" data-formatter="amountFormatter" data-visible="false">Frais</th>
                                     <th data-field="discount_on_shipping_costs" data-formatter="amountFormatter" data-visible="false">Remise sur frais</th>
@@ -32,12 +35,19 @@
                                     <th data-formatter="senderFormatter">Exp&eacute;diteur</th>
                                     <th data-formatter="recipientFormatter">Destinataire</th>
                                     <th data-field="destination_country.libelle_country">Pays de destinat.</th>
-                                    <th data-field="state" data-formatter="stateFormatter">Etat</th>
+                                    @if(Auth::user()->role != "Agent")
+                                    <th data-field="libelle_agency" data-visible="false">Agence</th>
+                                    <th data-field="created_by.name" data-visible="false">Caissier</th>
+                                    @endif
+                                    @if(Auth::user()->role == "Agent")
+                                    <th data-formatter="autrorizedFormatter" data-visible="false">Autorisation</th>
+                                    @endif
+                                    <th data-field="state" data-formatter="stateFormatter">Pay&eacute;</th>
                                     @if(Auth::user()->role == "Agent")
                                     <th data-formatter="optionAgentFormatter" data-width="60px" data-align="center"><i class="ki ki-wrench"></i></th>
                                     @endif
                                     @if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable")
-                                    <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    <th data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
                                     @endif
                                 </tr>
                             </thead>
@@ -61,6 +71,7 @@
                         </div>
                         <div class="modal-body">
                             <input type="text" ng-hide="true" name="id" id="id">
+                            <input type="text" ng-hide="true" name="amountTotal" id="amountTotal">
                             @csrf
                             <div class="row">
                                 <div class="col-md-3">
@@ -79,7 +90,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Montant &agrave; envoyer *</label>
-                                        <input type="number" class="form-control" name="amount" id="amount" placeholder="Montat" required>
+                                        <input type="text" pattern="[0-9]+" min="0" class="form-control" name="amount" id="amount" placeholder="Montat" required>
                                     </div>
                                 </div>
                                 <div class="col-md-5">
@@ -88,7 +99,7 @@
                                             <label>
                                                 <input type="checkbox" name="shipping_costs_included" id="shipping_costs_included" ng-checked="sendMoney.shipping_costs_included==1" onchange='handleChange(this);'/><span></span>
                                             </label>
-                                            <label for="shipping_costs_included">&nbsp;Cochez si les frais d'envoie est inclus</label>
+                                            <label for="shipping_costs_included">&nbsp;Cochez si le frais d'envoie est inclus</label>
                                         </span>
                                     </div>
                                 </div>
@@ -122,7 +133,7 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>Montant total à payer *</label>
-                                        <input type="text" class="form-control" id="amountTotal" placeholder="Montat" name="amountTotal" readonly>
+                                        <input type="text" class="form-control" id="amountTotalAff" placeholder="Montat" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -137,11 +148,11 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Nom *</label>
-                                        <input type="text" class="form-control" name="sender_name" id="sender_name" required>
+                                        <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="sender_name" id="sender_name" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Pr&eacute;nom(s) *</label>
-                                        <input type="text" class="form-control" name="sender_surname" id="sender_surname" required>
+                                        <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="sender_surname" id="sender_surname" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Contact *</label>
@@ -158,11 +169,11 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label>Nom *</label>
-                                        <input type="text" class="form-control" name="recipient_name" id="recipient_name" required>
+                                        <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="recipient_name" id="recipient_name" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Pr&eacute;nom(s) *</label>
-                                        <input type="text" class="form-control" name="recipient_surname" id="recipient_surname" required>
+                                        <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="recipient_surname" id="recipient_surname" required>
                                     </div>
                                     <div class="form-group">
                                         <label>Contact *</label>
@@ -198,8 +209,14 @@
                         <div class="modal-body">
                             <input type="text" ng-hide="true" id="idSendMoneyDelete" value="@{{ sendMoney.id }}">
                             @csrf
+                            @if(Auth::user()->role == "Agent")
                             <p class="text-center text-muted h5">Etes vous certain de vouloir supprimer cet enregistrement ?</p>
-                            <p class="text-center h4">@{{ sendMoney.sendDate + ' de ' + sendMoney.sender.name}}</p>
+                            <p class="text-center h4">@{{ sendMoney.secret_code}}</p>
+                            @endif
+                            @if(Auth::user()->role != "Agent")
+                            <p class="text-center text-muted h5">Etes vous certain de vouloir autoriser la suppression de cet enregistrement ?</p>
+                            <p class="text-center h4">@{{ sendMoney.secret_code}}</p>
+                            @endif
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default font-weight-bold" data-dismiss="modal">Annuler</button>
@@ -253,21 +270,76 @@
         });
 
         $("#destination_country_id").change(function (e) {
+            var role = $("#role").val();
             var country = $("#destination_country_id").val();
-            if(country != ""){
+            let checkBox = document.getElementById('shipping_costs_included');
+            let id = $("#id").val();
+            let total = $("#amountTotal").val();
+
+            if(country != "" && checkBox.checked && id == "" && total == "" && role == "Agent"){
+                var amount = $("#amount").val();
+                var shipping_cost = $("#shipping_cost").val();
+                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
+                var amountSend = parseInt(amount) - parseInt(shipping_cost);
+                var amountTotal = parseInt(amount) - parseInt(discount_on_shipping_costs);
+                var totalPaye = Intl.NumberFormat().format(amountTotal); 
+                $("#amountTotalAff").val(totalPaye);
+                $("#amountTotal").val(amountTotal);
+                $("#amount").val(amountSend);
+            }
+
+            if(country != "" && checkBox.checked && id != "" && total == "" && role != "Agent"){
+                var amount = $("#amount").val();
+                var shipping_cost = $("#shipping_cost").val();
+                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
+                var amountSend = parseInt(amount) - parseInt(shipping_cost);
+                var amountTotal = parseInt(amount) - parseInt(discount_on_shipping_costs);
+                var totalPaye = Intl.NumberFormat().format(amountTotal); 
+                $("#amountTotalAff").val(totalPaye);
+                $("#amountTotal").val(amountTotal);
+                $("#amount").val(amountSend);
+            }
+
+            if(country != "" && !checkBox.checked && id != "" && total == "" && role == "Agent"){
                 var amount = $("#amount").val();
                 var shipping_cost = $("#shipping_cost").val();
                 var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
                 var amountTotal = parseInt(amount) + parseInt(shipping_cost) - parseInt(discount_on_shipping_costs);
                 var totalPaye = Intl.NumberFormat().format(amountTotal); 
-                $("#amountTotal").val(totalPaye);
+                $("#amountTotalAff").val(totalPaye);
+                $("#amountTotal").val(amountTotal);
+            }
+            if(country != "" && !checkBox.checked && id != "" && total == "" && role != "Agent"){
+                var amount = $("#amount").val();
+                var shipping_cost = $("#shipping_cost").val();
+                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
+                var amountTotal = parseInt(amount) + parseInt(shipping_cost) - parseInt(discount_on_shipping_costs);
+                var totalPaye = Intl.NumberFormat().format(amountTotal); 
+                $("#amountTotalAff").val(totalPaye);
+                $("#amountTotal").val(amountTotal);
             }
         });
+
         $("#amount").keyup(function (e) {
-            $("#shipping_cost").val("");
-            $("#discount_on_shipping_costs").val("");
-            $("#amountTotal").val("");
-            $("#shipping_costs_included").prop("checked", false);
+            var role = $("#role").val();
+            let id = $("#id").val();
+
+            if(id == "" && (role == "Agent")){
+                $("#shipping_cost").val("");
+                $("#discount_on_shipping_costs").val("");
+                $("#amountTotal").val("");
+                $("#shipping_costs_included").prop("checked", false);
+                $("#destination_country_id").val("").trigger('change');
+            }
+        });
+
+        $("#discount_on_shipping_costs").keyup(function (e) {
+            var role = $("#role").val();
+            let id = $("#id").val();
+            if(id == "" || (role != "Agent")){
+                $("#amountTotal").val("");
+                $("#destination_country_id").val("").trigger('change');
+            }
         });
         
         $("#btnModalAjout").on("click", function () {
@@ -354,6 +426,7 @@
             $("#shipping_cost").val("");
             $("#discount_on_shipping_costs").val("");
             $("#amountTotal").val("");
+            $("#destination_country_id").val("").trigger('change');
         }
     }
 
@@ -374,7 +447,8 @@
         $("#recipient_id").val(sendMoney.recipient_id);
         var amountTotal = parseInt(sendMoney.amount) + parseInt(sendMoney.shipping_cost) - parseInt(sendMoney.discount_on_shipping_costs);
         var totalPaye = Intl.NumberFormat().format(amountTotal); 
-        $("#amountTotal").val(totalPaye);
+        $("#amountTotalAff").val(totalPaye);
+        $("#amountTotal").val(amountTotal);
         if(role == "Agent"){
             $('#amount, #shipping_cost, #discount_on_shipping_costs').prop('readOnly', true);
             $(".costs_included").hide();
@@ -399,11 +473,11 @@
         $(".bs-modal-ajout").modal("show");
     }
 
-    function deleteRow(idOperation) {
+    function deleteRow(idSendMoney) {
         var $scope = angular.element($("#formSupprimer")).scope();
-        var operation =_.findWhere(rows, {id: idOperation});
+        var sendMoney =_.findWhere(rows, {id: idSendMoney});
         $scope.$apply(function () {
-            $scope.populateForm(operation);
+            $scope.populateForm(sendMoney);
         });
        $(".bs-modal-supprimer").modal("show");
     }
@@ -413,10 +487,10 @@
     }
     function stateFormatter(state){
         if(state == "sent"){
-            return "<span>Envoyé<span>";
+            return "<span class='text-danger'>NON<span>";
         }
         if(state == "withdrawn"){
-            return "<span class='text-success'>Retiré<span>";
+            return "<span class='text-success'>OUI<span>";
         }
     }
     function senderFormatter(id, row){
@@ -433,15 +507,44 @@
         let totalPaye = parseInt(row.amount) + parseInt(row.shipping_cost)-parseInt(row.discount_on_shipping_costs);
         return Intl.NumberFormat().format(totalPaye);
     } 
+    function autrorizedFormatter(id, row){
+        if(row.to_delete == 1){
+            return "<span class='text-success'>Suppression autorisé le "+row.authorizationDate+" par " + row.authorized_by.name + "<span>";
+        }else{
+            return "---";
+        }
+    }
+    function printRow(idSendMoney){
+       window.open("recu-money-send/" + idSendMoney ,'_blank')
+    }
+    function recuFormatter(id, row){
+        if(row.state == "withdrawn"){
+            return "---";
+        }else{
+            return '<a class="flaticon2-printer text-secondary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Imprimer" onClick="javascript:printRow(' + row.id + ');"></a>'; 
+        }
+    }
     function optionAgentFormatter(id, row){
         if(row.to_delete == 1){
             return '<a class="flaticon-delete text-danger cursor-pointer ml-2" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + row.id + ');"></a>';
-        }else{
+        }
+        if(row.state == "withdrawn"){
+            return "---";
+        }
+        if(row.to_delete == 0 && row.state == "sent"){
             return '<a class="flaticon2-pen text-primary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + row.id + ');"></a>';
         }     
     }
     function optionFormatter(id, row) {
-        return '<a class="flaticon2-pen text-primary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + id + ');"></a>\n\<a class="flaticon-delete text-danger cursor-pointer ml-2" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + id + ');"></a>';
+        if(row.to_delete == 1){
+            return "<span class='text-danger'>A supprimer<span>";
+        }
+        if(row.state == "withdrawn"){
+            return "---";
+        }
+        if(row.to_delete == 0 && row.state == "sent"){
+            return '<a class="flaticon2-pen text-primary cursor-pointer mr-4 ml-2" data-toggle="tooltip" title="Modifier" onClick="javascript:updateRow(' + row.id + ');"></a>\n\<a class="flaticon-delete text-danger cursor-pointer ml-2" data-toggle="tooltip" title="Supprimer" onClick="javascript:deleteRow(' + row.id + ');"></a>';
+        }
     }
 
     function editerSendMoneyAction(methode, url, $formObject, formData, $overlayBlock, $spinnerLg,$table) {

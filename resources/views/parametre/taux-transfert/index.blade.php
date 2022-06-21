@@ -26,7 +26,9 @@
                                     <th data-field="montant_maximum" data-formatter="montantFormatter">Montant maximum</th>
                                     <th data-field="montant_fixe" data-formatter="montantFormatter">Montant fixe</th>
                                     <th data-field="taux" data-formatter="tauxFormatter">Taux</th>
+                                    @if(Auth::user()->role == "Administrateur")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

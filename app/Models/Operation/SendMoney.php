@@ -29,9 +29,10 @@ class SendMoney extends Model
         'deleted_by',
         'updated_by',
         'created_by',
+        'authorized_by',
     ];
 
-    protected $dates = ['send_date','deleted_at'];
+    protected $dates = ['send_date','authorization_date','deleted_at'];
 
     public function sender(){
         return $this->belongsTo(Customer::class,'sender_id');
@@ -59,5 +60,9 @@ class SendMoney extends Model
 
     public function created_by(){
         return $this->belongsTo(User::class,'created_by');
+    }
+
+    public function authorized_by(){
+        return $this->belongsTo(User::class,'authorized_by');
     }
 }

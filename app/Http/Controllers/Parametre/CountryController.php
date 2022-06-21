@@ -16,9 +16,9 @@ class CountryController extends Controller
 
         $menuPrincipal = "Paramètre";
         $titleControlleur = "Pays";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = Auth::user()->role == "Administrateur" ? "TRUE" : "FALSE";
 
-        if(Auth::user()->role == "Administrateur"){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
             return view('parametre.country.index', compact('menuPrincipal', 'titleControlleur', 'btnModalAjout'));
         }else{
             return abort(404);

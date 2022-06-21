@@ -165,6 +165,13 @@ class OperationController extends Controller
 
     //** Décaissement - Encaissement */
     public function vueOperationDecaissementEncaissement(){
+        if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant'){
+            $caisses = CaisseOuverte::join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')
+                        ->select('libelle_caisse','caisse_ouvertes.id')
+                        ->where('caisse_ouvertes.date_fermeture',NULL)
+                        ->orderBy('libelle_caisse', 'ASC')
+                        ->get();
+        }
         if(Auth::user()->role == "Superviseur"){
             $caisses = CaisseOuverte::join('caisses','caisses.id','=','caisse_ouvertes.caisse_id')
                         ->select('libelle_caisse','caisse_ouvertes.id')
@@ -308,10 +315,10 @@ class OperationController extends Controller
             }
         }
         if(Auth::user()->role == "Agent"){
-            $operations = Operation::with('user','authorized_by','bank','partenair')
+            $operations = Operation::with('user')
                             ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
-                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
-                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operations.state',"authorized"]])
+                            ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'))
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
                             ->orderBy('id', 'DESC')
                             ->get();
             foreach ($operations as $operation) {
@@ -366,7 +373,7 @@ class OperationController extends Controller
             $operations = Operation::with('user','authorized_by','bank','partenair')
                             ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
-                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operations.state',"authorized"],['reference','like','%'.$reference.'%']])
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['reference','like','%'.$reference.'%']])
                             ->orderBy('id', 'DESC')
                             ->get();
             foreach ($operations as $operation) {
@@ -421,7 +428,7 @@ class OperationController extends Controller
             $operations = Operation::with('user','authorized_by','bank','partenair')
                             ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
-                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operations.state',"authorized"],['operation_type',$type]])
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operation_type',$type]])
                             ->orderBy('id', 'DESC')
                             ->get();
             foreach ($operations as $operation) {
@@ -530,7 +537,7 @@ class OperationController extends Controller
             $operations = Operation::with('user','authorized_by','bank','partenair')
                             ->join('caisse_ouvertes','caisse_ouvertes.id','=','operations.caisse_ouverte_id')
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
-                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],['operations.state',"authorized"],[$concerne,'!=',NULL]])
+                            ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL],[$concerne,'!=',NULL]])
                             ->orderBy('id', 'DESC')
                             ->get();
             foreach ($operations as $operation) {

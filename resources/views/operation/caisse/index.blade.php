@@ -126,9 +126,11 @@
                             <label for="centrer">Rechercher par concern&eacute;</label>
                             <select class="form-control" id="searchByConcerne">
                                 <option value="0"> Tous</option>
+                                @if(Auth::user()->role!="Agent")
                                 <option value="partenair_id"> Partenaire</option>
                                 <option value="bank_id"> Banque </option>
                                 <option value="other_caisse_id"> Encaiss - Decaiss</option>
+                                @endif
                                 @if(Auth::user()->role=="Agent")
                                 <option value="send_money_id"> Envoie d'argent</option>
                                 <option value="withdrawal_money_id"> Retrait d'argent</option>
@@ -430,6 +432,12 @@
             }
             if(row.partenair_id){
                 return "<span>Partenaire " + row.partenair.name + "<span>";
+            }
+            if(row.withdrawal_money_id){
+                return "<span>Retrait d'argent<span>";
+            }
+            if(row.send_money_id){
+                return "<span>Envoie d'argent<span>";
             }
         }
         function typeFormatter(type){

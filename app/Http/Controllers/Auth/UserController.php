@@ -23,9 +23,13 @@ class UserController extends Controller
 
         $menuPrincipal = "Auth";
         $titleControlleur = "Utilisateurs";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = Auth::user()->role == "Administrateur" ? "TRUE" : "FALSE";
 
-        return view('auth.user.index', compact('countries','btnModalAjout', 'menuPrincipal', 'titleControlleur'));
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            return view('auth.user.index', compact('countries','btnModalAjout', 'menuPrincipal', 'titleControlleur'));
+        }else{
+            return abort(404);
+        }
     }
 
     public function profil(){

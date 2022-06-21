@@ -50,7 +50,9 @@
                                     <th data-field="user.name">Caissier</th>
                                     <th data-field="observation" data-visible="false">Observation</th>
                                     <th data-field="file_to_upload" data-formatter="fileFormatter" data-visible="false">Document</th>
+                                    @if(Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

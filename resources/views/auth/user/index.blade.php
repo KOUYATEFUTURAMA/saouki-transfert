@@ -29,7 +29,9 @@
                                 <th data-field="agency.libelle_agency">Agence</th>
                                 <th data-field="statut_compte" data-formatter="statutFormatter">Etat</th>
                                 <th data-field="last_login">Derni&egrave;re connex.</th>
+                                @if(Auth::user()->role == "Administrateur")
                                 <th data-field="id" data-formatter="optionFormatter" data-width="120px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                @endif
                             </tr>
                         </thead>
                     </table>

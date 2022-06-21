@@ -25,7 +25,9 @@
                                 <tr role="row">
                                     <th data-field="libelle_municipality" data-searchable="true" data-sortable="true">Commune</th>
                                     <th data-field="city.libelle_city">Ville</th>
+                                    @if(Auth::user()->role == "Administrateur")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

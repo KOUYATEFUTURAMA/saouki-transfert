@@ -25,7 +25,9 @@
                                     <th data-field="contact">Contact</th>
                                     <th data-field="country.libelle_country">Pays</th>
                                     <th data-field="adress">Adresse</th>
+                                    @if(Auth::user()->role == "Administrateur")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

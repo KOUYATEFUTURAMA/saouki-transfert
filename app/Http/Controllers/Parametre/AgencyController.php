@@ -26,9 +26,9 @@ class AgencyController extends Controller
 
         $menuPrincipal = "Paramètre";
         $titleControlleur = "Agence";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = Auth::user()->role == "Administrateur" ? "TRUE" : "FALSE";
 
-        if(Auth::user()->role == "Administrateur"){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
             return view('parametre.agency.index', compact('countries','cities','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
         }else{
             return abort(404);

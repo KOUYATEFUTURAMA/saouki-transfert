@@ -30,6 +30,8 @@ class CreateSendMoneyTable extends Migration
             $table->dateTime('deleted_at')->nullable();
             $table->integer('deleted_by')->unsigned()->nullable();
             $table->integer('updated_by')->unsigned()->nullable();
+            $table->integer("authorized_by")->nullable();
+            $table->dateTime("authorization_date")->nullable();
             $table->integer('created_by')->unsigned()->nullable();//agent
             $table->timestamps();
         });

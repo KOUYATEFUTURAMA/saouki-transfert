@@ -29,7 +29,9 @@
                                     <th data-field="city.libelle_city">Ville</th>
                                     <th data-field="municipality.libelle_municipality">Commune</th>
                                     <th data-field="adress_agency" data-visible="false">Adresse</th>
+                                    @if(Auth::user()->role == "Administrateur")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

@@ -20,9 +20,9 @@ class CustomerController extends Controller
 
         $menuPrincipal = "Paramètre";
         $titleControlleur = "Client";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = Auth::user()->role == "Administrateur" ? "TRUE" : "FALSE";
 
-        if(Auth::user()->role == "Administrateur"){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
             return view('parametre.customer.index', compact('countries','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
         }else{
             return abort(404);
@@ -32,6 +32,7 @@ class CustomerController extends Controller
     public function listCustomers(){
         $customers = Customer::with('country')
                             ->select('customers.*')
+                            ->groupBy('contact')
                             ->orderBy('name', 'ASC')
                             ->get();
 

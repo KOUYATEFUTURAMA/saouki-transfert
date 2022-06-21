@@ -26,7 +26,9 @@
                                     <th data-field="country.libelle_country">Pays</th>
                                     <th data-field="city.libelle_city">Ville</th>
                                     <th data-field="agency.libelle_agency">Agence</th>
+                                    @if(Auth::user()->role == "Administrateur")
                                     <th data-field="id" data-formatter="optionFormatter" data-width="100px" data-align="center"><i class="ki ki-wrench"></i></th>
+                                    @endif
                                 </tr>
                             </thead>
                     </table>

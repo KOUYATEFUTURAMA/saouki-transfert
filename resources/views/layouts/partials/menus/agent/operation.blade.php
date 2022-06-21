@@ -33,11 +33,11 @@
                     <i class="menu-bullet menu-bullet-dot">
                         <span></span>
                     </i>
-                    <span class="menu-text">Envoie d'argent</span>
+                    <span class="menu-text">Envoi d'argent</span>
                 </a>
             </li>
-            <li class="menu-item" aria-haspopup="true">
-                <a href="" class="menu-link">
+            <li class="menu-item {{Route::currentRouteName() === 'operation.withdrawal-money.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('operation.withdrawal-money.index')}}" class="menu-link">
                     <i class="menu-bullet menu-bullet-dot">
                         <span></span>
                     </i>

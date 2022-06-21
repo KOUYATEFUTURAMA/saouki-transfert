@@ -52,6 +52,22 @@
                     <span class="menu-text">D&eacute;caiss. - Encaiss.</span>
                 </a>
             </li>
+            <li class="menu-item {{Route::currentRouteName() === 'operation.send-money.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('operation.send-money.index')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Envoi d'argent</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'operation.withdrawal-money.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('operation.withdrawal-money.index')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Retrait d'argent</span>
+                </a>
+            </li>
         </ul>
     </div>
 </li>
