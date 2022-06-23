@@ -50,7 +50,31 @@ class BankController extends Controller
         return response()->json($jsonData);
     }
 
-    public function listCitiesByCountry($country){
+    public function listBankByCountry($country){
+        $banks = Bank::with('country')
+                            ->select('banks.*')
+                            ->where('country_id',$country)
+                            ->orderBy('libelle_bank', 'ASC')
+                            ->get();
+
+        $jsonData["rows"] = $banks->toArray();
+        $jsonData["total"] = $banks->count();
+        return response()->json($jsonData);
+    }
+
+    public function listSoldeBanks($banque = null){
+        $banks = Bank::with('country')
+                            ->select('banks.*')
+                            ->where('country_id',$banque)
+                            ->orderBy('libelle_bank', 'ASC')
+                            ->get();
+
+        $jsonData["rows"] = $banks->toArray();
+        $jsonData["total"] = $banks->count();
+        return response()->json($jsonData);
+    }
+
+    public function listSoldeBankByCountry($country){
         $banks = Bank::with('country')
                             ->select('banks.*')
                             ->where('country_id',$country)

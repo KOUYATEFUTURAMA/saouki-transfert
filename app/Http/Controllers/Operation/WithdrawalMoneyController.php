@@ -202,6 +202,51 @@ class WithdrawalMoneyController extends Controller
         $jsonData["total"] = $withdrawalMoney->count();
         return response()->json($jsonData);
     }
+    public function listWithdrawalMoneyByRecipient($recipient){
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            $withdrawalMoney = WithdrawalMoney::with('created_by')
+                            ->join('send_money','send_money.id','=','withdrawal_money.send_money_id')
+                            ->join('customers as sender','sender.id','=','send_money.sender_id')
+                            ->join('customers as recipient','recipient.id','=','send_money.recipient_id')
+                            ->join('countries','countries.id','=','send_money.sending_country_id')
+                            ->join('users','users.id','=','withdrawal_money.created_by')
+                            ->join('agencies','agencies.id','=','users.agency_id')
+                            ->select('withdrawal_money.*','sender.name as senderName','sender.surname as senderSurname','recipient.name as recipientName','recipient.surname as recipientSurname','countries.libelle_country','send_money.state','agencies.libelle_agency',DB::raw('DATE_FORMAT(withdrawal_date, "%d-%m-%Y %H:%i") as withdrawalDate'))
+                            ->where('withdrawal_money.id_recipient',$recipient)
+                            ->orderBy('withdrawal_money.id', 'DESC')
+                            ->get();
+        }
+        if(Auth::user()->role == "Superviseur"){
+            $withdrawalMoney = WithdrawalMoney::with('created_by')
+                            ->join('send_money','send_money.id','=','withdrawal_money.send_money_id')
+                            ->join('customers as sender','sender.id','=','send_money.sender_id')
+                            ->join('customers as recipient','recipient.id','=','send_money.recipient_id')
+                            ->join('countries','countries.id','=','send_money.sending_country_id')
+                            ->join('users','users.id','=','withdrawal_money.created_by')
+                            ->join('agencies','agencies.id','=','users.agency_id')
+                            ->select('withdrawal_money.*','sender.name as senderName','sender.surname as senderSurname','recipient.name as recipientName','recipient.surname as recipientSurname','countries.libelle_country','send_money.state','agencies.libelle_agency',DB::raw('DATE_FORMAT(withdrawal_date, "%d-%m-%Y %H:%i") as withdrawalDate'))
+                            ->where([['send_money.destination_country_id',Auth::user()->country_id],['withdrawal_money.id_recipient',$recipient]])
+                            ->orderBy('withdrawal_money.id', 'DESC')
+                            ->get();
+        }
+        if(Auth::user()->role == "Comptable"){
+            $withdrawalMoney = WithdrawalMoney::with('created_by')
+                            ->join('send_money','send_money.id','=','withdrawal_money.send_money_id')
+                            ->join('customers as sender','sender.id','=','send_money.sender_id')
+                            ->join('customers as recipient','recipient.id','=','send_money.recipient_id')
+                            ->join('countries','countries.id','=','send_money.sending_country_id')
+                            ->join('users','users.id','=','withdrawal_money.created_by')
+                            ->join('agencies','agencies.id','=','users.agency_id')
+                            ->select('withdrawal_money.*','sender.name as senderName','sender.surname as senderSurname','recipient.name as recipientName','recipient.surname as recipientSurname','countries.libelle_country','send_money.state','agencies.libelle_agency',DB::raw('DATE_FORMAT(withdrawal_date, "%d-%m-%Y %H:%i") as withdrawalDate'))
+                            ->where([['agencies.city_id',Auth::user()->city_id],['withdrawal_money.id_recipient',$recipient]])
+                            ->orderBy('withdrawal_money.id', 'DESC')
+                            ->get();
+        }
+
+        $jsonData["rows"] = $withdrawalMoney->toArray();
+        $jsonData["total"] = $withdrawalMoney->count();
+        return response()->json($jsonData);
+    }
     public function listWithdrawalMoneyByUser($user){
         if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
             $withdrawalMoney = WithdrawalMoney::with('created_by')
@@ -298,6 +343,7 @@ class WithdrawalMoneyController extends Controller
                 $withdrawalMoney->withdrawal_date = Carbon::createFromFormat('d-m-Y H:i', $data['withdrawalDate']);
                 $withdrawalMoney->send_money_id = $data['send_money_id'];
                 $withdrawalMoney->amount = $data['amount'];
+                $withdrawalMoney->id_recipient = $data['id_recipient'];
                 $withdrawalMoney->id_card_recipient = isset($data['id_card_recipient']) ? $data['id_card_recipient'] : NULL;
                 if(empty($data['id'])){
                     $withdrawalMoney->created_by = Auth::user()->id;

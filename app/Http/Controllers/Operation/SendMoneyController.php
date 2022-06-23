@@ -22,11 +22,16 @@ class SendMoneyController extends Controller
                         ->orderBy('libelle_country', 'ASC')
                         ->get();
 
+        $customers = DB::table('customers')
+                        ->select('name','surname','id')
+                        ->orderBy('name', 'ASC')
+                        ->get();
+
         $menuPrincipal = "Opération";
         $titleControlleur = "envoie d'argent";
         $btnModalAjout = Auth::user()->role == "Agent" ? "TRUE" : "FALSE";
 
-        return view('operation.send-money.index', compact('countries','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        return view('operation.send-money.index', compact('customers','countries','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
 
     public function listSendMoney(){
@@ -313,20 +318,25 @@ class SendMoneyController extends Controller
                     $maxId = DB::table('send_money')->max('id');
                     $sendMoney->secret_code = date("dmy-His-").sprintf("%03d", ($maxId+1));
 
-                    //enregistrement de l'expediteur et destinataire
-                    $sender = new Customer;
-                    $sender->name = $data['sender_name'];
-                    $sender->surname = $data['sender_surname'];
-                    $sender->contact = $data['sender_contact'];
-                    $sender->country_id = Auth::user()->country_id;
-                    $sender->save();
-
-                    $recipient = new Customer;
-                    $recipient->name = $data['recipient_name'];
-                    $recipient->surname = $data['recipient_surname'];
-                    $recipient->contact = $data['recipient_contact'];
-                    $recipient->country_id = $data['destination_country_id'];
-                    $recipient->save();
+                    //enregistrement de l'expediteur s'il n'est pas dans la base
+                    if(empty($data['sender_id'])){
+                        $sender = new Customer;
+                        $sender->name = $data['sender_name'];
+                        $sender->surname = $data['sender_surname'];
+                        $sender->contact = $data['sender_contact'];
+                        $sender->country_id = Auth::user()->country_id;
+                        $sender->save();
+                    }
+                    
+                    //enregistrement du destinataire s'il n'est pas dans la base
+                    if(empty($data['recipient_id'])){
+                        $recipient = new Customer;
+                        $recipient->name = $data['recipient_name'];
+                        $recipient->surname = $data['recipient_surname'];
+                        $recipient->contact = $data['recipient_contact'];
+                        $recipient->country_id = $data['destination_country_id'];
+                        $recipient->save();
+                    }
                 }
 
                 if(!empty($data['id'])){
@@ -347,8 +357,8 @@ class SendMoneyController extends Controller
 
                 $sendMoney->send_date = Carbon::createFromFormat('d-m-Y H:i', $data['sendDate']);
                 $sendMoney->state = 'sent';
-                $sendMoney->sender_id = $sender->id;
-                $sendMoney->recipient_id = $recipient->id; 
+                $sendMoney->sender_id = empty($data['sender_id']) ? $sender->id : $data['sender_id'];
+                $sendMoney->recipient_id = empty($data['recipient_id']) ? $recipient->id : $data['recipient_id']; 
                 $sendMoney->sending_country_id = Auth::user()->country_id;
                 $sendMoney->destination_country_id = $data['destination_country_id'];
                 $sendMoney->amount = $data['amount'];

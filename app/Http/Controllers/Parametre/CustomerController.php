@@ -29,6 +29,24 @@ class CustomerController extends Controller
         }
     }
 
+    public function ficheCustomer($id){
+        $customer = Customer::where('customers.id',$id)
+                        ->leftjoin('send_money','send_money.sender_id','=','customers.id')
+                        ->leftjoin('withdrawal_money','withdrawal_money.id_recipient','=','customers.id')
+                        ->select('customers.*',DB::raw('sum(send_money.amount) as allDeposit'),DB::raw('sum(withdrawal_money.amount) as allWithdrawal'))
+                        ->first();
+
+        $menuPrincipal = "Fiche de ";
+        $titleControlleur = "client";
+        $btnModalAjout = "FALSE";
+
+        if(Auth::user()->role == "Administrateur" or Auth::user()->role == "Gerant"){
+            return view('parametre.customer.fiche', compact('customer','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
+        }else{
+            return abort(404);
+        }
+    }
+
     public function listCustomers(){
         $customers = Customer::with('country')
                             ->select('customers.*')
@@ -40,7 +58,6 @@ class CustomerController extends Controller
         $jsonData["total"] = $customers->count();
         return response()->json($jsonData);
     }
-
     public function listCustomersByCountry($country){
         $customers = Customer::with('country')
                             ->select('customers.*')
@@ -52,7 +69,6 @@ class CustomerController extends Controller
         $jsonData["total"] = $customers->count();
         return response()->json($jsonData);
     }
-
     public function findCustomer($id){
         $customer = Customer::select('customers.*')
                             ->where('id',$id)
@@ -60,6 +76,61 @@ class CustomerController extends Controller
 
         $jsonData["rows"] = $customer->toArray();
         $jsonData["total"] = $customer->count();
+        return response()->json($jsonData);
+    }
+
+    //Opérations 
+    public function listOperationCustomer($name = null){
+        $totalEnvoi = 0; $totalRetrait = 0;
+        if($name){
+            $customers = Customer::with('country')
+                        ->leftjoin('send_money','send_money.sender_id','=','customers.id')
+                        ->leftjoin('withdrawal_money','withdrawal_money.id_recipient','=','customers.id')
+                        ->select('customers.*',DB::raw('sum(send_money.amount) as allDeposit'),DB::raw('sum(withdrawal_money.amount) as allWithdrawal'))->where('customers.name','like','%'.$name.'%')
+                        ->orWhere('customers.surname','like','%'.$name.'%')
+                        ->groupBy('customers.id')
+                        ->orderBy('allDeposit', 'DESC')
+                        ->get();
+        }else{
+            $customers = Customer::with('country')
+                        ->leftjoin('send_money','send_money.sender_id','=','customers.id')
+                        ->leftjoin('withdrawal_money','withdrawal_money.id_recipient','=','customers.id')
+                        ->select('customers.*',DB::raw('sum(send_money.amount) as allDeposit'),DB::raw('sum(withdrawal_money.amount) as allWithdrawal'))
+                        ->groupBy('customers.id')
+                        ->orderBy('allDeposit', 'DESC')
+                        ->get();
+        }
+
+        foreach ($customers as $customer) {
+            $totalEnvoi += $customer->allDeposit;
+            $totalRetrait += $customer->allWithdrawal;
+        }
+
+        $jsonData["rows"] = $customers->toArray();
+        $jsonData["total"] = $customers->count();
+        $jsonData["totalEnvoi"] = $totalEnvoi;
+        $jsonData["totalRetrait"] = $totalRetrait;
+        return response()->json($jsonData);
+    }
+    public function listOperationCustomerByCountry($country){
+        $totalEnvoi = 0; $totalRetrait = 0;
+        $customers = Customer::with('country')
+                        ->leftjoin('send_money','send_money.sender_id','=','customers.id')
+                        ->leftjoin('withdrawal_money','withdrawal_money.id_recipient','=','customers.id')
+                        ->select('customers.*',DB::raw('sum(send_money.amount) as allDeposit'),DB::raw('sum(withdrawal_money.amount) as allWithdrawal'))->where('customers.country_id',$country)
+                        ->groupBy('customers.id')
+                        ->orderBy('allDeposit', 'DESC')
+                        ->get();
+
+        foreach ($customers as $customer) {
+            $totalEnvoi += $customer->allDeposit;
+            $totalRetrait += $customer->allWithdrawal;
+        }
+
+        $jsonData["rows"] = $customers->toArray();
+        $jsonData["total"] = $customers->count();
+        $jsonData["totalEnvoi"] = $totalEnvoi;
+        $jsonData["totalRetrait"] = $totalRetrait;
         return response()->json($jsonData);
     }
 

@@ -65,19 +65,26 @@ Route::namespace('Parametre')->middleware('auth')->name('parametre.')->prefix('p
     Route::resource('customers', 'CustomerController');
     Route::get('list-customers', 'CustomerController@listCustomers');
     Route::get('list-customers-by-country/{country}', 'CustomerController@listCustomersByCountry');
+    Route::get('list-operation-customers/{name?}', 'CustomerController@listOperationCustomer');
+    Route::get('list-operation-customers-by-country/{country}', 'CustomerController@listOperationCustomerByCountry');
     Route::get('find-customer/{id}', 'CustomerController@findCustomer');
+    Route::get('fiche-customer/{id}', 'CustomerController@ficheCustomer');
 
-    //Route banks
+    //Route banks  
     Route::resource('banks', 'BankController');
     Route::get('list-banks', 'BankController@listBank');
     Route::get('find-bank/{id}', 'BankController@findBank');
     Route::get('list-banks-by-country/{country}', 'BankController@listBankByCountry');
+    Route::get('list-solde-banks/{libelle?}', 'BankController@listSoldeBanks');
+    Route::get('list-solde-banks-by-country/{country}', 'BankController@listSoldeBankByCountry');
 
     //Route partenairs 
     Route::resource('partenairs', 'PartenairController');
     Route::get('list-partenairs', 'PartenairController@listPartenairs');
     Route::get('find-partenair/{id}', 'PartenairController@findPartenair');
     Route::get('list-partenairs-by-country/{country}', 'PartenairController@listPartenairsByCountry');
+    Route::get('list-solde-partenairs/{name?}', 'PartenairController@listSoldePartenair');
+    Route::get('list-solde-partenairs-by-country/{country}', 'PartenairController@listSoldePartenairByCountry');
 
     //Route Taux transfert
     Route::resource('taux-transferts', 'TauxTransfertController');
@@ -134,9 +141,37 @@ Route::namespace('Operation')->middleware('auth')->name('operation.')->prefix('o
     Route::resource('withdrawal-money', 'WithdrawalMoneyController');
     Route::get('list-withdrawal-money', 'WithdrawalMoneyController@listWithdrawalMoney');
     Route::get('list-withdrawal-money-by-country/{country}', 'WithdrawalMoneyController@listWithdrawalMoneyByCountry');
+    Route::get('list-withdrawal-money-by-recipient/{recipient}', 'WithdrawalMoneyController@listWithdrawalMoneyByRecipient');
     Route::get('list-withdrawal-money-by-user/{user}', 'WithdrawalMoneyController@listWithdrawalMoneyByUser');
     Route::get('list-withdrawal-money-by-periode/{start}/{end}', 'WithdrawalMoneyController@listWithdrawalMoneyByPeriode');
     Route::get('recu-withdrawal-money/{id}', 'WithdrawalMoneyController@recuWithdrawalMoney');
+});
+
+//les routes du module Etat
+Route::namespace('Etat')->middleware('auth')->name('etat.')->prefix('etat')->group(function () {
+    //Route pour les vues   
+    Route::get('customers', 'EtatController@customer')->name('customers'); 
+    Route::get('banks', 'EtatController@bank')->name('banks'); 
+    Route::get('partenairs', 'EtatController@partenair')->name('partenairs'); 
+    Route::get('superviseurs', 'EtatController@superviseur')->name('superviseurs'); 
+    Route::get('comptables', 'EtatController@comptable')->name('comptables'); 
+    Route::get('caissiers', 'EtatController@caissier')->name('caissiers'); 
+    Route::get('agencies', 'EtatController@agency')->name('agencies'); 
+    Route::get('operations-partenairs', 'EtatController@operationPartenair')->name('operations-partenairs'); 
+    Route::get('operations-bank', 'EtatController@operationBank')->name('operations-bank'); 
+    Route::get('send-money', 'EtatController@sendMoney')->name('send-money'); 
+    Route::get('withdrawal-money', 'EtatController@withdrawalMoney')->name('withdrawal-money');
+    Route::get('encaiss-decaiss', 'EtatController@encaissDecaiss')->name('encaiss-decaiss'); 
+    Route::get('operation', 'EtatController@operation')->name('operation'); 
+    Route::get('caisse-closed', 'EtatController@caisseClosed')->name('caisse-closed'); 
+
+
+    //Route pour les pdf
+        /** customers */
+    Route::get('list-operation-customers-pdf', 'EtatController@listOperationCustomerPdf');
+    Route::get('list-operation-customers-by-country-pdf/{country}', 'EtatController@listOperationCustomerByCountryPdf');
+    Route::get('list-send-money-by-customers-pdf/{customers}', 'EtatController@listSendMoneyByCustomerPdf');
+    Route::get('list-withdrawal-money-by-customer-pdf/{customer}', 'EtatController@listWithdrawalMoneyByCustomerPdf');
 });
 
 //les routes du module Auth

@@ -134,6 +134,7 @@
                                     @include('layouts.partials.menus.comptable.etat')
                                 @endif
                                 @if(Auth::user()->role == 'Administrateur' or Auth::user()->role == 'Gerant')
+                                    @include('layouts.partials.menus.admin.index')
                                     @include('layouts.partials.menus.admin.parametre')
                                     @include('layouts.partials.menus.admin.operation')
                                     @include('layouts.partials.menus.admin.etat')
@@ -154,6 +155,7 @@
                                         </a>
                                     </li>
                                 @endif
+                                <li class="h-20px"></li>
                                 <li class="menu-item" aria-haspopup="true">
 									<a href="{{ route('logout') }}" class="menu-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
 										<span class="svg-icon menu-icon">

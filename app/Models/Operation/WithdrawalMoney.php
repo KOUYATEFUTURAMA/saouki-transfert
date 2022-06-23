@@ -13,6 +13,7 @@ class WithdrawalMoney extends Model
     protected $fillable = [
         'send_money_id',
         'id_card_recipient',
+        'id_recipient',
         'amount',
         'created_by',
     ];

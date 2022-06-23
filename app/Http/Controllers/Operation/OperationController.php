@@ -196,7 +196,7 @@ class OperationController extends Controller
         }
         $menuPrincipal = "Opération";
         $titleControlleur = "de décaissement et encaissement";
-        $btnModalAjout = "TRUE";
+        $btnModalAjout = (Auth::user()->role == "Superviseur" or Auth::user()->role == "Comptable") ? "TRUE" : "FALSE";
 
         return view('operation.decaissement-encaissement.index', compact('caisses','menuPrincipal', 'titleControlleur', 'btnModalAjout'));
     }
@@ -276,13 +276,6 @@ class OperationController extends Controller
                             ->select('operations.*',DB::raw('DATE_FORMAT(date, "%d-%m-%Y %H:%i") as dateOperation'),DB::raw('DATE_FORMAT(authorization_date, "%d-%m-%Y %H:%i") as authorizationDate'))
                             ->orderBy('id', 'DESC')
                             ->get();
-            foreach ($operations as $operation) {
-                if($operation->operation_type == "deposit"){
-                    $totalEntree += $operation->amount;
-                }else{
-                    $totalSortie += $operation->amount;
-                }
-            }
         }
         if(Auth::user()->role == "Superviseur"){
             $operations = Operation::with('user','authorized_by','bank','partenair')
@@ -291,13 +284,6 @@ class OperationController extends Controller
                             ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
                             ->orderBy('id', 'DESC')
                             ->get();
-            foreach ($operations as $operation) {
-                if($operation->operation_type == "deposit"){
-                    $totalEntree += $operation->amount;
-                }else{
-                    $totalSortie += $operation->amount;
-                }
-            }
         }
         if(Auth::user()->role == "Comptable"){
             $operations = Operation::with('user','authorized_by','bank','partenair')
@@ -306,13 +292,6 @@ class OperationController extends Controller
                             ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
                             ->orderBy('id', 'DESC')
                             ->get();
-            foreach ($operations as $operation) {
-                if($operation->operation_type == "deposit"){
-                    $totalEntree += $operation->amount;
-                }else{
-                    $totalSortie += $operation->amount;
-                }
-            }
         }
         if(Auth::user()->role == "Agent"){
             $operations = Operation::with('user')
@@ -321,12 +300,13 @@ class OperationController extends Controller
                             ->where([['operations.user_id',Auth::user()->id],['caisse_ouvertes.date_fermeture',NULL]])
                             ->orderBy('id', 'DESC')
                             ->get();
-            foreach ($operations as $operation) {
-                if($operation->operation_type == "deposit"){
-                    $totalEntree += $operation->amount;
-                }else{
-                    $totalSortie += $operation->amount;
-                }
+        }
+
+        foreach ($operations as $operation) {
+            if($operation->operation_type == "deposit"){
+                $totalEntree += $operation->amount;
+            }else{
+                $totalSortie += $operation->amount;
             }
         }
 

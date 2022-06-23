@@ -18,6 +18,7 @@ class CreateWithdrawalMoneyTable extends Migration
             $table->dateTime("withdrawal_date");
             $table->integer("send_money_id");
             $table->bigInteger("amount");
+            $table->integer("id_recipient");
             $table->string("id_card_recipient")->nullable();
             $table->integer('created_by')->unsigned()->nullable();//agent
             $table->timestamps();

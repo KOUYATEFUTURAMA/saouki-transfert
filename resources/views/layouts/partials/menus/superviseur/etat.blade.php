@@ -1,4 +1,4 @@
-<li class="menu-item menu-item-submenu {{request()->is('operation/*') ? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
+<li class="menu-item menu-item-submenu {{request()->is('etat/*') ? 'menu-item-here menu-item-open menu-item-active' : ''}}" aria-haspopup="true" data-menu-toggle="hover">
     <a href="javascript:;" class="menu-link menu-toggle">
         <span class="svg-icon menu-icon">
             <!--begin::Svg Icon | path:assets/media/svg/icons/Design/Layers.svg-->
@@ -20,12 +20,84 @@
     <div class="menu-submenu">
         <i class="menu-arrow"></i>
         <ul class="menu-subnav">
-            <li class="menu-item {{Route::currentRouteName() === 'operation.caisse-ouvertes.index' ? 'menu-item-active' : ''}}" aria-haspopup="true">
-                <a href="{{route('operation.caisse-ouvertes.index')}}" class="menu-link">
+            <li class="menu-item {{Route::currentRouteName() === 'etat.comptables' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.comptables')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des comptables</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.caissiers' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.caissiers')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des caissiers</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.agencies' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.agencies')}}" class="menu-link">
                     <i class="menu-bullet menu-bullet-dot">
                         <span></span>
                     </i>
                     <span class="menu-text">Liste des agences</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.operations-partenairs' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.operations-partenairs')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Op&eacute;rations des partenaires</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.operations-bank' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.operations-bank')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Op&eacute;rations bancaires</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.send-money' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.send-money')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des envois</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.withdrawal-money' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.withdrawal-money')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des retraits</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.encaiss-decaiss' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.encaiss-decaiss')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des encaiss - d&eacute;caiss.</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.operation' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.operation')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des op&eacute;rations</span>
+                </a>
+            </li>
+            <li class="menu-item {{Route::currentRouteName() === 'etat.caisse-closed' ? 'menu-item-active' : ''}}" aria-haspopup="true">
+                <a href="{{route('etat.caisse-closed')}}" class="menu-link">
+                    <i class="menu-bullet menu-bullet-dot">
+                        <span></span>
+                    </i>
+                    <span class="menu-text">Liste des clotures de caisse</span>
                 </a>
             </li>
         </ul>

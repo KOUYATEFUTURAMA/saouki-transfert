@@ -143,9 +143,19 @@
                                 <div class="col-md-12">
                                     <h3 class="pb-1 text-dark-75 font-weight-bolder font-size-h5 text-center">Exp&eacute;diteur</h3>
                                 </div>
-                                <input type="text" ng-hide="true" name="sender_id" id="sender_id">
                                 <hr/>
                                 <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="sender_id">Slectionner l'exp&eacute;diteur s'il existe dans la liste </label>
+                                        <div class="input-group">
+                                            <select class="form-control" id="sender_id" name="sender_id">
+                                                <option value=""> Selectionner l'exp&eacute;diteur </option>
+                                                @foreach($customers as $sender)
+                                                    <option value="{{$sender->id}}"> {{$sender->name.' '.$sender->surname}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label>Nom *</label>
                                         <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="sender_name" id="sender_name" required>
@@ -164,9 +174,19 @@
                                 <div class="col-md-12">
                                     <h3 class="pb-1 text-dark-75 font-weight-bolder font-size-h5 text-center">Destinataire</h3>
                                 </div>
-                                <input type="text" ng-hide="true" name="recipient_id" id="recipient_id">
                                 <hr/>
                                 <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="recipient_id">Slectionner le destinataire s'il existe dans la liste  </label>
+                                        <div class="input-group">
+                                            <select class="form-control" id="recipient_id" name="recipient_id">
+                                                <option value=""> Selectionner le destinataire </option>
+                                                @foreach($customers as $recipient)
+                                                    <option value="{{$recipient->id}}"> {{$recipient->name.' '.$recipient->surname}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <label>Nom *</label>
                                         <input type="text" class="form-control" onkeyup="this.value = this.value.charAt(0).toUpperCase() + this.value.substr(1);" name="recipient_name" id="recipient_name" required>
@@ -259,7 +279,7 @@
             rows = data.rows;
         });
 
-        $('#destination_country_id').select2({width: '100%'});
+        $('#destination_country_id, #recipient_id, #sender_id').select2({width: '100%'});
 
         $('#kt_datetimepicker_2').datetimepicker({
             locale: 'fr',
@@ -269,49 +289,50 @@
             maxDate : new Date()
         });
 
+        $("#sender_id").change(function (e) {
+            var sender = $("#sender_id").val();
+            //get sender info
+            if(sender != ""){
+                $.getJSON("../parametre/find-customer/" + sender, function (reponse) {
+                    $.each(reponse.rows, function (index, customer) { 
+                        $("#sender_name").val(customer.name);
+                        $("#sender_surname").val(customer.surname);
+                        $("#sender_contact").val(customer.contact);
+                    });
+                });
+            }else{
+                $("#sender_name").val("");
+                $("#sender_surname").val("");
+                $("#sender_contact").val("");
+            }
+        });
+
+        $("#recipient_id").change(function (e) {
+            var recipient = $("#recipient_id").val();
+            //get recipient info
+            if(recipient != ""){
+                $.getJSON("../parametre/find-customer/" + recipient, function (reponse) {
+                    $.each(reponse.rows, function (index, customer) { 
+                        $("#recipient_name").val(customer.name);
+                        $("#recipient_surname").val(customer.surname);
+                        $("#recipient_contact").val(customer.contact);
+                    });
+                });
+            }else{
+                $("#recipient_name").val("");
+                $("#recipient_surname").val("");
+                $("#recipient_contact").val("");
+            }
+        });
+
         $("#destination_country_id").change(function (e) {
-            var role = $("#role").val();
-            var country = $("#destination_country_id").val();
-            let checkBox = document.getElementById('shipping_costs_included');
-            let id = $("#id").val();
-            let total = $("#amountTotal").val();
 
-            if(country != "" && checkBox.checked && id == "" && total == "" && role == "Agent"){
-                var amount = $("#amount").val();
-                var shipping_cost = $("#shipping_cost").val();
-                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
-                var amountSend = parseInt(amount) - parseInt(shipping_cost);
-                var amountTotal = parseInt(amount) - parseInt(discount_on_shipping_costs);
-                var totalPaye = Intl.NumberFormat().format(amountTotal); 
-                $("#amountTotalAff").val(totalPaye);
-                $("#amountTotal").val(amountTotal);
-                $("#amount").val(amountSend);
-            }
+            $("#amountTotalAff").val("");
+            $("#amountTotal").val("");
+            var amount = $("#amount").val();
+            var shipping_cost = $("#shipping_cost").val();
 
-            if(country != "" && checkBox.checked && id != "" && total == "" && role != "Agent"){
-                var amount = $("#amount").val();
-                var shipping_cost = $("#shipping_cost").val();
-                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
-                var amountSend = parseInt(amount) - parseInt(shipping_cost);
-                var amountTotal = parseInt(amount) - parseInt(discount_on_shipping_costs);
-                var totalPaye = Intl.NumberFormat().format(amountTotal); 
-                $("#amountTotalAff").val(totalPaye);
-                $("#amountTotal").val(amountTotal);
-                $("#amount").val(amountSend);
-            }
-
-            if(country != "" && !checkBox.checked && id != "" && total == "" && role == "Agent"){
-                var amount = $("#amount").val();
-                var shipping_cost = $("#shipping_cost").val();
-                var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
-                var amountTotal = parseInt(amount) + parseInt(shipping_cost) - parseInt(discount_on_shipping_costs);
-                var totalPaye = Intl.NumberFormat().format(amountTotal); 
-                $("#amountTotalAff").val(totalPaye);
-                $("#amountTotal").val(amountTotal);
-            }
-            if(country != "" && !checkBox.checked && id != "" && total == "" && role != "Agent"){
-                var amount = $("#amount").val();
-                var shipping_cost = $("#shipping_cost").val();
+            if(amount != "" && shipping_cost != ""){
                 var discount_on_shipping_costs = $("#discount_on_shipping_costs").val() != "" ? $("#discount_on_shipping_costs").val() : 0;
                 var amountTotal = parseInt(amount) + parseInt(shipping_cost) - parseInt(discount_on_shipping_costs);
                 var totalPaye = Intl.NumberFormat().format(amountTotal); 
@@ -321,29 +342,22 @@
         });
 
         $("#amount").keyup(function (e) {
-            var role = $("#role").val();
-            let id = $("#id").val();
-
-            if(id == "" && (role == "Agent")){
-                $("#shipping_cost").val("");
-                $("#discount_on_shipping_costs").val("");
-                $("#amountTotal").val("");
-                $("#shipping_costs_included").prop("checked", false);
-                $("#destination_country_id").val("").trigger('change');
-            }
+            $("#shipping_cost").val("");
+            $("#discount_on_shipping_costs").val("");
+            $("#shipping_costs_included").prop("checked", false);
+            $("#destination_country_id").val("").trigger('change');
+            $("#amountTotal").val("");
+            $("#amountTotalAff").val("");
         });
 
         $("#discount_on_shipping_costs").keyup(function (e) {
-            var role = $("#role").val();
-            let id = $("#id").val();
-            if(id == "" || (role != "Agent")){
-                $("#amountTotal").val("");
-                $("#destination_country_id").val("").trigger('change');
-            }
+            $("#amountTotal").val("");
+            $("#destination_country_id").val("").trigger('change');
+            $("#amountTotalAff").val("");
         });
         
         $("#btnModalAjout").on("click", function () {
-            $("#destination_country_id").val('').trigger('change');
+            $("#destination_country_id, #sender_id, #recipient_id").val('').trigger('change');
             $('#amount, #shipping_cost, #discount_on_shipping_costs').prop('readOnly', false);
             $(".costs_included").show();
         });
@@ -372,6 +386,7 @@
 
     function handleChange(checkbox) {
         var amount = $("#amount").val();
+        $("#destination_country_id").val('').trigger('change');
         var frais = 0;
         var reste = 0;
         if(amount == ""){
@@ -443,8 +458,8 @@
         $("#shipping_cost").val(sendMoney.shipping_cost);
         $("#discount_on_shipping_costs").val(sendMoney.discount_on_shipping_costs);
         $("#destination_country_id").val(sendMoney.destination_country_id).trigger('change');
-        $("#sender_id").val(sendMoney.sender_id);
-        $("#recipient_id").val(sendMoney.recipient_id);
+        $("#sender_id").val(sendMoney.sender_id).trigger('change');
+        $("#recipient_id").val(sendMoney.recipient_id).trigger('change');
         var amountTotal = parseInt(sendMoney.amount) + parseInt(sendMoney.shipping_cost) - parseInt(sendMoney.discount_on_shipping_costs);
         var totalPaye = Intl.NumberFormat().format(amountTotal); 
         $("#amountTotalAff").val(totalPaye);
@@ -562,9 +577,7 @@
                         showConfirmButton: false,
                         timer: 2500
                     });
-                    document.forms["formAjout"].reset();
-                    $("#destination_country_id").val('').trigger('change');
-                    $table.bootstrapTable('refresh');
+                    location.reload();
                 }
                 if (response.code === 0) {
                     Swal.fire({

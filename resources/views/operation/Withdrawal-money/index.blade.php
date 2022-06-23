@@ -59,6 +59,7 @@
                         <div class="modal-body">
                             <input type="text" ng-hide="true" name="id" id="id">
                             <input type="text" ng-hide="true" name="amount" id="amount">
+                            <input type="text" ng-hide="true" name="id_recipient" id="id_recipient">
                             @csrf 
                             <div class="row">
                                 <div class="col-md-3">
@@ -210,6 +211,7 @@
                     $("#recipient_surname").val(sendMoney.recipient.surname);
                     $("#recipient_contact").val(sendMoney.recipient.contact);
                     $("#recipient_country").val(sendMoney.destination_country.libelle_country);
+                    $("#id_recipient").val(sendMoney.recipient.id);
                 });
             });
         });
